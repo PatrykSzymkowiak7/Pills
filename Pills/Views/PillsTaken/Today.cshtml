@@ -1,0 +1,48 @@
+﻿@using Pills.Models.ViewModels.PillsTaken
+@model List<TodayPillViewModel>
+
+<h1>Dzisiaj - @String.Format("{0:dd/MM/yyyy}", DateTime.Today)</h1>
+
+@foreach (var pill in Model)
+{
+    <div class="mb-2">
+        <strong>@pill.Name</strong>
+
+        @if (pill.Taken && !pill.MultipleAllowed)
+        {
+            <span style="color:green; margin-left:10px;">✔️ Wzięta</span>
+        }
+        else if(pill.MultipleAllowed)
+        {
+            if(pill.CanTake)
+            {
+                <form asp-controller="PillsTaken" asp-action="Take" method="post" style="display:inline;">
+                    @Html.AntiForgeryToken()
+                    <span>Dzisiaj wziąłeś: @pill.TakenCountToday tabletek</span>
+                    <input type="hidden" name="pillTypeId" value="@pill.PillTypeId" />
+                    <button type="submit">Weź kolejną</button>
+                </form>
+            }
+            else
+            {
+                <span style="color:green; margin-left:10px;">✔️ Wzięłeś już maksymalną dawkę @pill.MaxAllowed tabletek</span>
+            }
+        }
+        else
+        {
+            <form asp-controller="PillsTaken" asp-action="Take" method="post" style="display:inline;">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="pillTypeId" value="@pill.PillTypeId" />
+                <button type="submit">Zaznacz jako wziętą</button>
+            </form>
+        }
+    </div>
+}
+
+@if (Model.Count == 0)
+{
+    <div class="mb-2">
+        <h2>Nie wziąłeś żadnych tabletek</h2>
+    </div>
+}
+

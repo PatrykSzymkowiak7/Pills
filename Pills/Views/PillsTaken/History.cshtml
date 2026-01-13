@@ -1,0 +1,27 @@
+﻿@using Pills.Models.ViewModels.PillsTaken
+@model List<HistoryDayViewModel>
+
+<h1 class="mb-4">Historia tabletek</h1>
+
+<table class="table table-striped table-hover w-auto">
+    <thead class="table-light">
+        <tr>
+            <th>Data</th>
+            <th>Tabletki wzięte</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var day in Model)
+        {
+            <tr>
+                <td>@day.Date.ToString("dd/MM/yyyy")</td>
+                <td>
+                    @foreach(var pill in day.PillsTaken)
+                    {
+                        <span class="badge bg-primary me-1">@pill</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,29 @@
+﻿@using Pills.Models.ViewModels.PillTypes
+@model CreatePillTypeViewModel
+
+<h1>Dodaj nową tabletkę</h1>
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="MaxAllowed" class="form-label"></label>
+        <input asp-for="MaxAllowed" class="form-control" />
+        <span asp-validation-for="MaxAllowed" class="text-danger"></span>
+        <div class="form-text">
+            Jeśli > 1, tabletka może być brana wiele razy dziennie
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Dodaj</button>
+</form>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}
