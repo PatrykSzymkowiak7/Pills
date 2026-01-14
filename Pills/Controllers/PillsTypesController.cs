@@ -66,24 +66,26 @@ namespace Pills.Controllers
             return View();
         }
 
-        public IActionResult Delete()
+        // GET
+        public IActionResult PillTypeHub()
         {
             var model = _dbContext.PillsTypes
                 .AsNoTracking()
                 .Select(pt => 
-                new DeletePillTypeViewModel
+                new PillTypeHubViewModel
                 {
                     Id = pt.Id,
                     Name = pt.Name,
-                    Count = _dbContext.PillsTaken.Where(pta => pta.PillType.Id == pt.Id).Count()
+                    Count = _dbContext.PillsTaken.Where(pta => pta.PillType.Id == pt.Id).Count(),
+                    MaxAllowed = pt.MaxAllowed
                 }).ToList();
 
             return View(model);
         }
 
-        public IActionResult ConfirmDelete(int pillTypeId)
+        public IActionResult ConfirmDelete(int id)
         {
-            var pillType = _dbContext.PillsTypes.Where(pt => pt.Id == pillTypeId).Select(pt => new DeletePillTypeViewModel
+            var pillType = _dbContext.PillsTypes.Where(pt => pt.Id == id).Select(pt => new DeletePillTypeViewModel
             {
                 Id = pt.Id,
                 Name = pt.Name,
@@ -98,9 +100,9 @@ namespace Pills.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(int pillTypeId)
+        public IActionResult DeleteConfirmed(int id)
         {
-            var result = _pillService.DeletePillType(pillTypeId);
+            var result = _pillService.DeletePillType(id);
 
             switch(result.Status)
             {
@@ -120,7 +122,45 @@ namespace Pills.Controllers
                     throw new InvalidOperationException($"Wystąpił nieobsłużony wyjątek: {result}");
             }
 
-            return RedirectToAction(nameof(Delete));
+            return RedirectToAction(nameof(PillTypeHub));
+        }
+
+        // GET
+        public IActionResult Edit(int id)
+        {
+            var pillType = _dbContext.PillsTypes.Find(id);
+            if (pillType == null)
+                return NotFound();
+
+            var model = new EditPillTypeViewModel
+            {
+                Id = pillType.Id,
+                Name = pillType.Name,
+                MaxAllowed = pillType.MaxAllowed
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(EditPillTypeViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var pillType = _dbContext.PillsTypes.Find(model.Id);
+            if (pillType == null)
+                return NotFound();
+
+            pillType.Name = model.Name;
+            pillType.MaxAllowed = model.MaxAllowed;
+
+            _dbContext.SaveChanges();
+
+            TempData[TempDataKeys.Success] = "Tabletka zaktualizowana";
+
+            return RedirectToAction(nameof(PillTypeHub));
         }
     }
 }
