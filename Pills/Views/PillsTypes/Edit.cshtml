@@ -1,1 +1,23 @@
-﻿
+﻿@using Pills.Models.ViewModels.PillTypes
+@model EditPillTypeViewModel
+
+<h1>Edytuj tabletkę</h1>
+
+<form asp-action="Edit" method="Post">
+
+    <input asp-for="Id" type="hidden" />
+
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="MaxAllowed" class="form-label"></label>
+        <input asp-for="MaxAllowed" class="form-control" />
+        <span asp-validation-for="MaxAllowed" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Zapisz</button>
+</form>
