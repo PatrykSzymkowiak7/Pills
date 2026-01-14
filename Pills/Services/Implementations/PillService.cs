@@ -1,5 +1,6 @@
 ﻿using Pills.Models;
 using Pills.Services.Interfaces;
+using Pills.Common;
 
 namespace Pills.Services.Implementations
 {
@@ -12,16 +13,16 @@ namespace Pills.Services.Implementations
             _dbContext = dbContext;
         }
 
-        public OperationResult CreatePillType(string name, int maxAllowed)
+        public OperationResult<int> CreatePillType(string name, int maxAllowed)
         {
-            if(_dbContext.PillsTypes.Any(p => p.Name == name))
-                return OperationResult.AlreadyExists;
+            if (_dbContext.PillsTypes.Any(p => p.Name == name))
+                return OperationResult<int>.Fail(OperationStatus.AlreadyExists);
 
             if (maxAllowed < 1)
-                return OperationResult.InvalidData;
+                return OperationResult<int>.Fail(OperationStatus.InvalidData);
 
             if (string.IsNullOrWhiteSpace(name))
-                return OperationResult.InvalidData;
+                return OperationResult<int>.Fail(OperationStatus.InvalidData);
 
             var pillType = new PillsTypes
             {
@@ -32,15 +33,15 @@ namespace Pills.Services.Implementations
             _dbContext.PillsTypes.Add(pillType);
             _dbContext.SaveChanges();
 
-            return OperationResult.Success;
+            return OperationResult<int>.Ok(pillType.Id);
         }
 
-        public OperationResult DeletePillType(int pillTypeId)
+        public OperationResult<bool> DeletePillType(int pillTypeId)
         {
             var pillType = _dbContext.PillsTypes.SingleOrDefault(pt => pt.Id == pillTypeId);
 
             if (pillType == null)
-                return OperationResult.NotFound;
+                return OperationResult<bool>.Fail(OperationStatus.NotFound);
 
             var pillsTaken = _dbContext.PillsTaken.Where(pt => pt.PillType.Id == pillTypeId).ToList();
 
@@ -48,22 +49,22 @@ namespace Pills.Services.Implementations
             _dbContext.PillsTypes.Remove(pillType);
             _dbContext.SaveChanges();
 
-            return OperationResult.Success;
+            return OperationResult<bool>.Ok(true);
         }
 
-        public OperationResult TakePill(int pillTypeId, DateTime date)
+        public OperationResult<bool> TakePill(int pillTypeId, DateTime date)
         {
             var pillType = _dbContext.PillsTypes.SingleOrDefault(pt => pt.Id == pillTypeId);
 
             if (pillType == null)
-                return OperationResult.NotFound;
+                return OperationResult<bool>.Fail(OperationStatus.NotFound);
 
             var takenCount = _dbContext.PillsTaken.Count(pt =>
                 pt.PillType.Id == pillTypeId &&
-                pt.Date == pt.Date);
+                pt.Date == date);
 
             if (takenCount >= pillType.MaxAllowed)
-                return OperationResult.MaxLimitReached;
+                return OperationResult<bool>.Fail(OperationStatus.MaxLimitReached);
 
             _dbContext.PillsTaken.Add(new PillsTaken
             {
@@ -73,7 +74,7 @@ namespace Pills.Services.Implementations
 
             _dbContext.SaveChanges();
 
-            return OperationResult.Success;
+            return OperationResult<bool>.Ok(true);
         }
     }
 }

@@ -1,0 +1,22 @@
+﻿@using Pills.Models.ViewModels.PillTypes
+@model DeletePillTypeViewModel
+
+<h2>Czy na pewno chcesz usunąć?</h2>
+
+<div class="alert alert-warning">
+    <strong>@Model.Name</strong><br />
+    Wzięte razy: <strong>@Model.Count</strong>
+</div>
+
+<form asp-action="DeleteConfirmed" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="pillTypeId" value="@Model.Id" />
+    
+    <button type="submit" class="btn btn-danger">
+        Tak, usuń
+    </button>
+
+    <a asp-action="Delete" class="btn btn-secondary">
+        Anuluj
+    </a>
+</form>

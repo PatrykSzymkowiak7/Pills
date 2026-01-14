@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Pills.Models;
 using Pills.Models.ViewModels.PillTypes;
 using Pills.Services.Interfaces;
+using Pills.Common;
 
 namespace Pills.Controllers
 {
@@ -35,22 +36,22 @@ namespace Pills.Controllers
             {
                 var result = _pillService.CreatePillType(model.Name, model.MaxAllowed);
 
-                switch (result)
+                switch (result.Status)
                 {
-                    case OperationResult.Success:
-                        TempData["Success"] = "Operacja przebiegła pomyślnie";
+                    case OperationStatus.Success:
+                        TempData[TempDataKeys.Success] = "Operacja przebiegła pomyślnie";
                         break;
 
-                    case OperationResult.AlreadyExists:
-                        TempData["Error"] = "Tabletka o takiej nazwie już istnieje";
+                    case OperationStatus.AlreadyExists:
+                        TempData[TempDataKeys.Error] = "Tabletka o takiej nazwie już istnieje";
                         break;
 
-                    case OperationResult.Error:
-                        TempData["Error"] = "Wystąpił błąd podczas dodawania typu tabletki";
+                    case OperationStatus.Error:
+                        TempData[TempDataKeys.Error] = "Wystąpił błąd podczas dodawania typu tabletki";
                         break;
 
-                    case OperationResult.InvalidData:
-                        TempData["Error"] = "Wprowadzono niepoprawne dane";
+                    case OperationStatus.InvalidData:
+                        TempData[TempDataKeys.Error] = "Wprowadzono niepoprawne dane";
                         break;
 
                     default:
@@ -73,30 +74,46 @@ namespace Pills.Controllers
                 new DeletePillTypeViewModel
                 {
                     Id = pt.Id,
-                    Name = pt.Name
+                    Name = pt.Name,
+                    Count = _dbContext.PillsTaken.Where(pta => pta.PillType.Id == pt.Id).Count()
                 }).ToList();
 
             return View(model);
         }
 
+        public IActionResult ConfirmDelete(int pillTypeId)
+        {
+            var pillType = _dbContext.PillsTypes.Where(pt => pt.Id == pillTypeId).Select(pt => new DeletePillTypeViewModel
+            {
+                Id = pt.Id,
+                Name = pt.Name,
+                Count = _dbContext.PillsTaken.Where(pta => pta.PillType.Id == pt.Id).Count()
+            }).SingleOrDefault();
+
+            if (pillType == null)
+                return NotFound();
+
+            return View(pillType);
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(int id)
+        public IActionResult DeleteConfirmed(int pillTypeId)
         {
-            var result = _pillService.DeletePillType(id);
+            var result = _pillService.DeletePillType(pillTypeId);
 
-            switch(result)
+            switch(result.Status)
             {
-                case OperationResult.Success:
-                    TempData["Success"] = "Operacja przebiegła pomyślnie";
+                case OperationStatus.Success:
+                    TempData[TempDataKeys.Success] = "Operacja przebiegła pomyślnie";
                     break;
 
-                case OperationResult.NotFound:
-                    TempData["Error"] = "Nie znaleziono takiej tabletki";
+                case OperationStatus.NotFound:
+                    TempData[TempDataKeys.Error] = "Nie znaleziono takiej tabletki";
                     break;
 
-                case OperationResult.Error:
-                    TempData["Error"] = "Wystąpił błąd podczas usuwania tabletki";
+                case OperationStatus.Error:
+                    TempData[TempDataKeys.Error] = "Wystąpił błąd podczas usuwania tabletki";
                     break;
 
                 default:

@@ -2,13 +2,6 @@
 
 namespace Pills.Models
 {
-    public enum PillName
-    {
-        Magnesium,
-        VitaminD,
-        Denicit
-    }
-
     public class PillsTypes
     {
         [Key]

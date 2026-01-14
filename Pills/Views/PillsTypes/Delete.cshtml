@@ -1,2 +1,28 @@
-﻿@model Pills.Models.ViewModels.PillTypes.DeletePillTypeViewModel
+﻿@using Pills.Models.ViewModels.PillTypes
+@model List<DeletePillTypeViewModel>
 
+<h1>Usuń tabletkę</h1>
+
+<table class="table table-striped table-hover w-auto">
+    <thead class="table-light">
+        <tr>
+            <th>Nazwa tabletki</th>
+            <th>Liczba wziętych tabletek</th>
+            <th>Akcja</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var pillType in Model)
+        {
+            <tr>
+                <td>@pillType.Name</td>
+                <td>@pillType.Count</td>
+                <td>
+                    <a asp-action="ConfirmDelete" name="pillTypeId" asp-route-pillTypeId="@pillType.Id" class="btn btn-danger btn-sm">
+                        Usuń
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

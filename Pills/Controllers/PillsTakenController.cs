@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Pills.Models;
 using Pills.Models.ViewModels.PillsTaken;
 using Pills.Services.Interfaces;
+using Pills.Common;
 
 namespace Pills.Controllers
 {
@@ -40,17 +41,17 @@ namespace Pills.Controllers
         {
             var result = _pillService.TakePill(pillTypeId, DateTime.Today);
 
-            switch (result)
+            switch (result.Status)
             {
-                case OperationResult.Success:
-                    TempData["Success"] = "Tabletka dodana";
+                case OperationStatus.Success:
+                    TempData[TempDataKeys.Success] = "Tabletka wzięta pomyślnie";
                     break;
 
-                case OperationResult.MaxLimitReached:
-                    TempData["Error"] = "Osiągnięto maksymalną dawkę";
+                case OperationStatus.MaxLimitReached:
+                    TempData[TempDataKeys.Error] = "Osiągnięto maksymalną dawkę";
                     break;
 
-                case OperationResult.NotFound:
+                case OperationStatus.NotFound:
                     return NotFound();
 
                 default:
