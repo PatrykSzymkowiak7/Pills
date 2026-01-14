@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using Pills;
 using Pills.Services.Implementations;
 using Pills.Services.Interfaces;
-using System;
 
 var builder = WebApplication.CreateBuilder(args);
 

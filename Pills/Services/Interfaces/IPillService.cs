@@ -1,19 +1,11 @@
-﻿namespace Pills.Services.Interfaces
-{
-    public enum OperationResult
-    {
-        Success,
-        MaxLimitReached,
-        NotFound,
-        Error,
-        AlreadyExists,
-        InvalidData
-    }
+﻿using Pills.Common;
 
+namespace Pills.Services.Interfaces
+{
     public interface IPillService
     {
-        OperationResult TakePill(int pillTypeId, DateTime date);
-        OperationResult DeletePillType(int pillTypeId);
-        OperationResult CreatePillType(string name, int maxAllowed);
+        OperationResult<bool> TakePill(int pillTypeId, DateTime date);
+        OperationResult<bool> DeletePillType(int pillTypeId);
+        OperationResult<int> CreatePillType(string name, int maxAllowed);
     }
 }
