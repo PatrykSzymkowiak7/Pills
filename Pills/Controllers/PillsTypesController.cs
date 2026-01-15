@@ -11,11 +11,13 @@ namespace Pills.Controllers
     {
         private readonly AppDbContext _dbContext;
         private readonly IPillService _pillService;
+        private readonly ILogger<PillsTypesController> _logger;
 
-        public PillsTypesController(AppDbContext dbContext, IPillService pillService)
+        public PillsTypesController(AppDbContext dbContext, IPillService pillService, ILogger<PillsTypesController> logger)
         {
             _dbContext = dbContext;
             _pillService = pillService;
+            _logger = logger;
         }
 
         // GET
@@ -27,14 +29,14 @@ namespace Pills.Controllers
         // POST
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(CreatePillTypeViewModel model)
+        public async Task<IActionResult> Create(CreatePillTypeViewModel model)
         {
             if(!ModelState.IsValid)
                 return View(model);
 
             try
             {
-                var result = _pillService.CreatePillType(model.Name, model.MaxAllowed);
+                var result = await _pillService.CreatePillTypeAsync(model.Name, model.MaxAllowed);
 
                 switch (result.Status)
                 {
@@ -67,9 +69,9 @@ namespace Pills.Controllers
         }
 
         // GET
-        public IActionResult PillTypeHub()
+        public async Task<IActionResult> PillTypeHub()
         {
-            var model = _dbContext.PillsTypes
+            var model = await _dbContext.PillsTypes
                 .AsNoTracking()
                 .Select(pt => 
                 new PillTypeHubViewModel
@@ -78,19 +80,19 @@ namespace Pills.Controllers
                     Name = pt.Name,
                     Count = _dbContext.PillsTaken.Where(pta => pta.PillType.Id == pt.Id).Count(),
                     MaxAllowed = pt.MaxAllowed
-                }).ToList();
+                }).ToListAsync();
 
             return View(model);
         }
 
-        public IActionResult ConfirmDelete(int id)
+        public async Task<IActionResult> ConfirmDelete(int id)
         {
-            var pillType = _dbContext.PillsTypes.Where(pt => pt.Id == id).Select(pt => new DeletePillTypeViewModel
+            var pillType = await _dbContext.PillsTypes.Where(pt => pt.Id == id).Select(pt => new DeletePillTypeViewModel
             {
                 Id = pt.Id,
                 Name = pt.Name,
                 Count = _dbContext.PillsTaken.Where(pta => pta.PillType.Id == pt.Id).Count()
-            }).SingleOrDefault();
+            }).SingleOrDefaultAsync();
 
             if (pillType == null)
                 return NotFound();
@@ -100,9 +102,9 @@ namespace Pills.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var result = _pillService.DeletePillType(id);
+            var result = await _pillService.DeletePillTypeAsync(id);
 
             switch(result.Status)
             {
@@ -144,19 +146,26 @@ namespace Pills.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(EditPillTypeViewModel model)
+        public async Task<IActionResult> Edit(EditPillTypeViewModel model)
         {
             if (!ModelState.IsValid)
                 return View(model);
 
-            var pillType = _dbContext.PillsTypes.Find(model.Id);
-            if (pillType == null)
-                return NotFound();
+            var result = await _pillService.EditPillAsync(model.Id, model.Name, model.MaxAllowed);
 
-            pillType.Name = model.Name;
-            pillType.MaxAllowed = model.MaxAllowed;
+            switch(result.Status)
+            {
+                case OperationStatus.NotFound:
+                    TempData[TempDataKeys.Error] = "Nie znaleziono takiej tabletki";
+                    break;
 
-            _dbContext.SaveChanges();
+                case OperationStatus.Success:
+                    TempData[TempDataKeys.Success] = "Operacja przebiegła pomyślnie";
+                    break;
+
+                default:
+                    throw new InvalidOperationException($"Wystąpił nieobsłużony wyjątek: {result.Status}");
+            }
 
             TempData[TempDataKeys.Success] = "Tabletka zaktualizowana";
 

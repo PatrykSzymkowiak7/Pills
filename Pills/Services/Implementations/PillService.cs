@@ -1,28 +1,31 @@
 ﻿using Pills.Models;
 using Pills.Services.Interfaces;
 using Pills.Common;
+using Microsoft.EntityFrameworkCore;
 
 namespace Pills.Services.Implementations
 {
     public class PillService : IPillService
     {
         private readonly AppDbContext _dbContext;
+        private readonly ILogger<PillService> _logger;
 
-        public PillService(AppDbContext dbContext)
+        public PillService(AppDbContext dbContext, ILogger<PillService> logger)
         {
             _dbContext = dbContext;
+            _logger = logger;
         }
 
-        public OperationResult<int> CreatePillType(string name, int maxAllowed)
+        public async Task<OperationResult<PillsTypes>> CreatePillTypeAsync(string name, int maxAllowed)
         {
-            if (_dbContext.PillsTypes.Any(p => p.Name == name))
-                return OperationResult<int>.Fail(OperationStatus.AlreadyExists);
+            if (await _dbContext.PillsTypes.AnyAsync(p => p.Name == name))
+                return OperationResult<PillsTypes>.Fail(OperationStatus.AlreadyExists);
 
             if (maxAllowed < 1)
-                return OperationResult<int>.Fail(OperationStatus.InvalidData);
+                return OperationResult<PillsTypes>.Fail(OperationStatus.InvalidData);
 
             if (string.IsNullOrWhiteSpace(name))
-                return OperationResult<int>.Fail(OperationStatus.InvalidData);
+                return OperationResult<PillsTypes>.Fail(OperationStatus.InvalidData);
 
             var pillType = new PillsTypes
             {
@@ -31,50 +34,67 @@ namespace Pills.Services.Implementations
             };
 
             _dbContext.PillsTypes.Add(pillType);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
 
-            return OperationResult<int>.Ok(pillType.Id);
+            return OperationResult<PillsTypes>.Ok(pillType);
         }
 
-        public OperationResult<bool> DeletePillType(int pillTypeId)
+        public async Task<OperationResult<bool>> DeletePillTypeAsync(int pillTypeId)
         {
-            var pillType = _dbContext.PillsTypes.SingleOrDefault(pt => pt.Id == pillTypeId);
+            var pillType = await _dbContext.PillsTypes.SingleOrDefaultAsync(pt => pt.Id == pillTypeId);
 
             if (pillType == null)
                 return OperationResult<bool>.Fail(OperationStatus.NotFound);
 
-            var pillsTaken = _dbContext.PillsTaken.Where(pt => pt.PillType.Id == pillTypeId).ToList();
+            var pillsTaken = await _dbContext.PillsTaken.Where(pt => pt.PillType.Id == pillTypeId).ToListAsync();
 
             _dbContext.PillsTaken.RemoveRange(pillsTaken);
             _dbContext.PillsTypes.Remove(pillType);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
 
             return OperationResult<bool>.Ok(true);
         }
 
-        public OperationResult<bool> TakePill(int pillTypeId, DateTime date)
+        public async Task<OperationResult<PillsTaken>> TakePillAsync(int pillTypeId, DateTime date)
         {
-            var pillType = _dbContext.PillsTypes.SingleOrDefault(pt => pt.Id == pillTypeId);
+            var pillType = await _dbContext.PillsTypes.SingleOrDefaultAsync(pt => pt.Id == pillTypeId);
 
             if (pillType == null)
-                return OperationResult<bool>.Fail(OperationStatus.NotFound);
+                return OperationResult<PillsTaken>.Fail(OperationStatus.NotFound);
 
-            var takenCount = _dbContext.PillsTaken.Count(pt =>
+            var takenCount = await _dbContext.PillsTaken.CountAsync(pt =>
                 pt.PillType.Id == pillTypeId &&
                 pt.Date == date);
 
             if (takenCount >= pillType.MaxAllowed)
-                return OperationResult<bool>.Fail(OperationStatus.MaxLimitReached);
+                return OperationResult<PillsTaken>.Fail(OperationStatus.MaxLimitReached);
 
-            _dbContext.PillsTaken.Add(new PillsTaken
+            var pillTaken = new PillsTaken
             {
                 Date = date,
                 PillType = pillType
-            });
+            };
 
-            _dbContext.SaveChanges();
+            _dbContext.PillsTaken.Add(pillTaken);
 
-            return OperationResult<bool>.Ok(true);
+            await _dbContext.SaveChangesAsync();
+
+            return OperationResult<PillsTaken>.Ok(pillTaken);
+        }
+
+        public async Task<OperationResult<PillsTypes>> EditPillAsync(int id, string name, int maxAllowed)
+        {
+            var pillType = await _dbContext.PillsTypes.SingleOrDefaultAsync(p => p.Id == id);
+
+            if (pillType == null)
+                return OperationResult<PillsTypes>.Fail(OperationStatus.NotFound);
+
+            pillType.Name = name;
+            pillType.MaxAllowed = maxAllowed;
+
+            await _dbContext.SaveChangesAsync();
+
+            return OperationResult<PillsTypes>.Ok(pillType);
         }
     }
 }
