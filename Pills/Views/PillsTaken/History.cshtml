@@ -1,5 +1,5 @@
 ﻿@using Pills.Models.ViewModels.PillsTaken
-@model List<HistoryDayViewModel>
+@model HistoryPagedViewModel
 
 <h1 class="mb-4">Historia tabletek</h1>
 
@@ -11,7 +11,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var day in Model)
+        @foreach (var day in Model.Days)
         {
             <tr>
                 <td>@day.Date.ToString("dd/MM/yyyy")</td>
@@ -25,3 +25,28 @@
         }
     </tbody>
 </table>
+<nav>
+    <ul class="pagination">
+        <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+            <a class="page-link" asp-action="History" asp-route-page="@(Model.CurrentPage - 1)">
+                Poprzednia
+            </a>
+        </li>
+
+        @for(int i = 1; i<=Model.TotalPages; i++)
+        {
+            <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                <a class="page-link" asp-action="History" asp-route-page="@i">
+                    @i
+                </a>
+            </li>
+        }
+
+        <li class="page-item" @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+            <a class="page-link" asp-action="History" asp-route-page="@(Model.CurrentPage+1)">
+                Następna
+            </a>
+        </li>
+
+    </ul>
+</nav>
