@@ -61,19 +61,35 @@ namespace Pills.Controllers
             return RedirectToAction(nameof(Today));
         }
 
-        public IActionResult History()
+        public IActionResult History(int page = 1)
         {
-            var model = _dbContext.PillsTaken
-                .AsNoTracking()
+            const int pageSize = 2;
+
+            var query = _dbContext.PillsTaken
                 .Include(pt => pt.PillType)
                 .AsEnumerable()
                 .GroupBy(p => p.Date.Date)
-                .OrderByDescending(g => g.Key)
+                .OrderByDescending(g => g.Key);
+
+            var totalDays = query.Count();
+
+            var days = query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .Select(g => new HistoryDayViewModel
                 {
                     Date = g.Key,
                     PillsTaken = g.Select(p => p.PillType.Name).ToList()
-                }).ToList();
+                })
+                .ToList();
+
+            var model = new HistoryPagedViewModel
+            {
+                Days = days,
+                CurrentPage = page,
+                PageSize = pageSize,
+                TotalPages = (int)Math.Ceiling(totalDays / (double)pageSize)
+            };
 
             return View(model);
         }
