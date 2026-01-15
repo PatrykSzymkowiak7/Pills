@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Pills.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace Pills.Models
 {
@@ -8,5 +9,7 @@ namespace Pills.Models
         public int Id { get; set; }
         public DateTime Date { get; set; }
         public PillsTypes PillType { get; set; }
+        public string? UserId { get; set; }
+        public ApplicationUser? User { get; set; }
     }
 }
