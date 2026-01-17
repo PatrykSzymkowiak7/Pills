@@ -5,6 +5,7 @@ using Pills.Services.Interfaces;
 using Pills.Common;
 using Microsoft.AspNetCore.Authorization;
 using Pills.Identity;
+using Pills.Controllers.Filters;
 
 namespace Pills.Controllers
 {
@@ -31,6 +32,7 @@ namespace Pills.Controllers
         // POST
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ServiceFilter(typeof(AdminAuditFilter))]
         public async Task<IActionResult> Create(CreatePillTypeViewModel model)
         {
             if(!ModelState.IsValid)
@@ -104,6 +106,7 @@ namespace Pills.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ServiceFilter(typeof(AdminAuditFilter))]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var result = await _pillService.DeletePillTypeAsync(id);
@@ -148,6 +151,7 @@ namespace Pills.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ServiceFilter(typeof(AdminAuditFilter))]
         public async Task<IActionResult> Edit(EditPillTypeViewModel model)
         {
             if (!ModelState.IsValid)

@@ -2,6 +2,7 @@ using AspNetCoreGeneratedDocument;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Pills;
+using Pills.Controllers.Filters;
 using Pills.Identity;
 using Pills.Services.Implementations;
 using Pills.Services.Interfaces;
@@ -41,6 +42,7 @@ builder.Services.AddAuthentication().AddGoogle(googleOptions =>
 });
 
 builder.Services.AddScoped<IPillService, PillService>();
+builder.Services.AddScoped<AdminAuditFilter>();
 
 var app = builder.Build();
 
