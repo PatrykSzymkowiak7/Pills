@@ -55,8 +55,11 @@ namespace Pills.Services.Implementations
             return OperationResult<bool>.Ok(true);
         }
 
-        public async Task<OperationResult<PillsTaken>> TakePillAsync(int pillTypeId, DateTime date)
+        public async Task<OperationResult<PillsTaken>> TakePillAsync(int pillTypeId, DateTime date, string userId)
         {
+            if (userId == null)
+                return OperationResult<PillsTaken>.Fail(OperationStatus.InvalidUser);
+
             var pillType = await _dbContext.PillsTypes.SingleOrDefaultAsync(pt => pt.Id == pillTypeId);
 
             if (pillType == null)
@@ -72,7 +75,8 @@ namespace Pills.Services.Implementations
             var pillTaken = new PillsTaken
             {
                 Date = date,
-                PillType = pillType
+                PillType = pillType,
+                UserId = userId
             };
 
             _dbContext.PillsTaken.Add(pillTaken);

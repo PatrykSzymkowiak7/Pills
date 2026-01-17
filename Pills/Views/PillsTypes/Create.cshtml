@@ -1,7 +1,7 @@
 ﻿@using Pills.Models.ViewModels.PillTypes
 @model CreatePillTypeViewModel
 
-<h1>Dodaj nową tabletkę</h1>
+<h1>Add new pill</h1>
 
 <form asp-action="Create" method="post">
     @Html.AntiForgeryToken()
@@ -17,7 +17,7 @@
         <input asp-for="MaxAllowed" class="form-control" />
         <span asp-validation-for="MaxAllowed" class="text-danger"></span>
         <div class="form-text">
-            Jeśli > 1, tabletka może być brana wiele razy dziennie
+            If > 1, pill can be taken multiple times daily
         </div>
     </div>
 
