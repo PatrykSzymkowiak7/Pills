@@ -7,6 +7,7 @@
         AlreadyExists,
         InvalidData,
         MaxLimitReached,
-        Error
+        Error,
+        InvalidUser
     }
 }

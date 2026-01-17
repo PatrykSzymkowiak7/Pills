@@ -1,13 +1,13 @@
 ﻿@using Pills.Models.ViewModels.PillsTaken
 @model HistoryPagedViewModel
 
-<h1 class="mb-4">Historia tabletek</h1>
+<h1 class="mb-4">History</h1>
 
 <table class="table table-striped table-hover w-auto">
     <thead class="table-light">
         <tr>
-            <th>Data</th>
-            <th>Tabletki wzięte</th>
+            <th>Date</th>
+            <th>Pills taken</th>
         </tr>
     </thead>
     <tbody>
@@ -29,7 +29,7 @@
     <ul class="pagination">
         <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
             <a class="page-link" asp-action="History" asp-route-page="@(Model.CurrentPage - 1)">
-                Poprzednia
+                Previous
             </a>
         </li>
 
@@ -44,7 +44,7 @@
 
         <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
             <a class="page-link" asp-action="History" asp-route-page="@(Model.CurrentPage+1)">
-                Następna
+                Next
             </a>
         </li>
 

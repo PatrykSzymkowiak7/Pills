@@ -1,12 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Pills.Models;
 using Pills.Models.ViewModels.PillTypes;
 using Pills.Services.Interfaces;
 using Pills.Common;
+using Microsoft.AspNetCore.Authorization;
+using Pills.Identity;
 
 namespace Pills.Controllers
 {
+    [Authorize(Roles = UserRoles.Admin)]
     public class PillsTypesController : Controller
     {
         private readonly AppDbContext _dbContext;

@@ -1,15 +1,15 @@
 ﻿@using Pills.Models.ViewModels.PillTypes
 @model List<PillTypeHubViewModel>
 
-<h1>Zarządzaj tabletkami</h1>
+<h1>Manage pills</h1>
 
 <table class="table table-striped table-hover w-auto">
     <thead class="table-light">
         <tr>
-            <th>Nazwa tabletki</th>
-            <th>Maksymalna dzienna dawka</th>
-            <th>Liczba wziętych tabletek</th>
-            <th>Akcja</th>
+            <th>Name</th>
+            <th>Maximum daily dose</th>
+            <th>Count of pills taken</th>
+            <th>Action</th>
         </tr>
     </thead>
     <tbody>
@@ -21,10 +21,10 @@
                 <td>@pillType.Count</td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@pillType.Id" class="btn btn-primary btn-sm">
-                        Edytuj
+                        Edit
                     </a>
                     <a asp-action="ConfirmDelete" asp-route-id="@pillType.Id" class="btn btn-danger btn-sm">
-                        Usuń
+                        Delete
                     </a>
                 </td>
             </tr>

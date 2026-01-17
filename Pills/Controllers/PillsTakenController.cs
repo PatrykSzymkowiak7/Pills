@@ -1,12 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Pills.Common;
 using Pills.Models;
 using Pills.Models.ViewModels.PillsTaken;
 using Pills.Services.Interfaces;
-using Pills.Common;
+using System.Security.Claims;
 
 namespace Pills.Controllers
 {
+    [Authorize]
     public class PillsTakenController : Controller
     {
         private readonly AppDbContext _dbContext;
@@ -41,7 +44,9 @@ namespace Pills.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Take(int pillTypeId)
         {
-            var result = await _pillService.TakePillAsync(pillTypeId, DateTime.Today);
+            var user = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var result = await _pillService.TakePillAsync(pillTypeId, DateTime.Today, user);
 
             switch (result.Status)
             {
@@ -67,8 +72,12 @@ namespace Pills.Controllers
         {
             const int pageSize = 2;
 
+            var user = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             var query = await _dbContext.PillsTaken
-                .Include(pt => pt.PillType).ToListAsync();
+                .Include(pt => pt.PillType)
+                .Where(p => p.UserId == user)
+                .ToListAsync();
 
             var grouped = query
                 .AsEnumerable()

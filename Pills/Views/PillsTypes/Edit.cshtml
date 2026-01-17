@@ -1,7 +1,7 @@
 ﻿@using Pills.Models.ViewModels.PillTypes
 @model EditPillTypeViewModel
 
-<h1>Edytuj tabletkę</h1>
+<h1>Edit pill</h1>
 
 <form asp-action="Edit" method="Post">
 
@@ -19,5 +19,5 @@
         <span asp-validation-for="MaxAllowed" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-primary">Zapisz</button>
+    <button type="submit" class="btn btn-primary">Save</button>
 </form>
