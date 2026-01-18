@@ -12,5 +12,7 @@ namespace Pills.Models
         public PillsTypes PillType { get; set; }
         public string UserId { get; set; }
         public ApplicationUser User { get; set; }
+        public bool IsDeleted { get; set; } = false;
+        public string DeletedBy { get; set; } = "System";
     }
 }

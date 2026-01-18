@@ -32,7 +32,7 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Identity/Account/Login";
-    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+    options.AccessDeniedPath = "/Error/403";
 });
 
 builder.Services.AddAuthentication().AddGoogle(googleOptions =>
@@ -64,14 +64,19 @@ using(var scope = app.Services.CreateScope())
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
+}
+else
+{
+    app.UseDeveloperExceptionPage();
 }
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseStatusCodePagesWithReExecute("/Error/{0}");
 
 app.UseAuthentication();
 app.UseAuthorization();

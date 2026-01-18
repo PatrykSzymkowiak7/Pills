@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Pills.Common;
+using Pills.Identity;
 using Pills.Models;
 using Pills.Models.ViewModels.PillsTaken;
 using Pills.Services.Interfaces;
@@ -15,17 +17,21 @@ namespace Pills.Controllers
         private readonly AppDbContext _dbContext;
         private readonly IPillService _pillService;
         private readonly ILogger<PillsTakenController> _logger;
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public PillsTakenController(AppDbContext dbContext, IPillService pillService, ILogger<PillsTakenController> logger)
+        public PillsTakenController(AppDbContext dbContext, IPillService pillService, 
+            ILogger<PillsTakenController> logger, SignInManager<ApplicationUser> signInManager)
         {
             _dbContext = dbContext;
             _pillService = pillService;
-            _logger = logger; 
+            _logger = logger;
+            _signInManager = signInManager;
         }
 
         public async Task<IActionResult> Today()
         {
             var today = DateTime.Today;
+            var user = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var model = await _dbContext.PillsTypes.Select(pt => new TodayPillViewModel
             {
@@ -34,7 +40,8 @@ namespace Pills.Controllers
                 MaxAllowed = pt.MaxAllowed,
                 TakenCountToday = _dbContext.PillsTaken.Count(p => 
                     p.PillType.Id == pt.Id && 
-                    p.Date == today)
+                    p.Date == today &&
+                    p.UserId == user)
             }).ToListAsync();
 
             return View(model);
