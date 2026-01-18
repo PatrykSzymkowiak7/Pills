@@ -16,7 +16,7 @@ namespace Pills.Services.Implementations
             _logger = logger;
         }
 
-        public async Task<OperationResult<PillsTypes>> CreatePillTypeAsync(string name, int maxAllowed)
+        public async Task<OperationResult<PillsTypes>> CreatePillTypeAsync(string name, int maxAllowed, string userId)
         {
             if (await _dbContext.PillsTypes.AnyAsync(p => p.Name == name))
                 return OperationResult<PillsTypes>.Fail(OperationStatus.AlreadyExists);
@@ -30,7 +30,8 @@ namespace Pills.Services.Implementations
             var pillType = new PillsTypes
             {
                 Name = name.Trim(),
-                MaxAllowed = maxAllowed
+                MaxAllowed = maxAllowed,
+                CreatedBy = userId
             };
 
             _dbContext.PillsTypes.Add(pillType);
@@ -39,17 +40,24 @@ namespace Pills.Services.Implementations
             return OperationResult<PillsTypes>.Ok(pillType);
         }
 
-        public async Task<OperationResult<bool>> DeletePillTypeAsync(int pillTypeId)
+        public async Task<OperationResult<bool>> DeletePillTypeAsync(int pillTypeId, string userId)
         {
-            var pillType = await _dbContext.PillsTypes.SingleOrDefaultAsync(pt => pt.Id == pillTypeId);
+            var pillType = await _dbContext.PillsTypes
+                .IgnoreQueryFilters()
+                .SingleOrDefaultAsync(pt => pt.Id == pillTypeId);
 
-            if (pillType == null)
+            if (pillType == null || pillType.IsDeleted)
                 return OperationResult<bool>.Fail(OperationStatus.NotFound);
 
-            var pillsTaken = await _dbContext.PillsTaken.Where(pt => pt.PillType.Id == pillTypeId).ToListAsync();
+            pillType.IsDeleted = true;
 
-            _dbContext.PillsTaken.RemoveRange(pillsTaken);
-            _dbContext.PillsTypes.Remove(pillType);
+            await _dbContext.PillsTaken
+                .IgnoreQueryFilters()
+                .Where(pt => pt.PillTypeId == pillTypeId)
+                .ExecuteUpdateAsync(setters => setters
+                .SetProperty(p => p.IsDeleted, true)
+                .SetProperty(p => p.DeletedBy, userId));
+
             await _dbContext.SaveChangesAsync();
 
             return OperationResult<bool>.Ok(true);
@@ -67,7 +75,8 @@ namespace Pills.Services.Implementations
 
             var takenCount = await _dbContext.PillsTaken.CountAsync(pt =>
                 pt.PillType.Id == pillTypeId &&
-                pt.Date == date);
+                pt.Date == date &&
+                pt.UserId == userId);
 
             if (takenCount >= pillType.MaxAllowed)
                 return OperationResult<PillsTaken>.Fail(OperationStatus.MaxLimitReached);
@@ -86,7 +95,7 @@ namespace Pills.Services.Implementations
             return OperationResult<PillsTaken>.Ok(pillTaken);
         }
 
-        public async Task<OperationResult<PillsTypes>> EditPillAsync(int id, string name, int maxAllowed)
+        public async Task<OperationResult<PillsTypes>> EditPillAsync(int id, string name, int maxAllowed, string userId)
         {
             var pillType = await _dbContext.PillsTypes.SingleOrDefaultAsync(p => p.Id == id);
 
@@ -95,6 +104,8 @@ namespace Pills.Services.Implementations
 
             pillType.Name = name;
             pillType.MaxAllowed = maxAllowed;
+            pillType.EditedBy = userId;
+            pillType.EditedAt = DateTime.Now;
 
             await _dbContext.SaveChangesAsync();
 

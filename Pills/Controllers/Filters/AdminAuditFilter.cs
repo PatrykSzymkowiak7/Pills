@@ -21,7 +21,10 @@ namespace Pills.Controllers.Filters
             var user = context.HttpContext.User.Identity?.Name;
             var action = context.ActionDescriptor.DisplayName;
 
-            _logger.LogInformation($"User {user} calls {action}", user, action);
+            _logger.LogInformation(
+                "User {user} calls {action}",
+                user, 
+                action);
         }
     }
 }

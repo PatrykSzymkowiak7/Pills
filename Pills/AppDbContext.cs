@@ -20,10 +20,13 @@ namespace Pills
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<PillsTypes>().HasData(
-                new PillsTypes { Id = 1, Name = "Magnesium" },
-                new PillsTypes { Id = 2, Name = "VitaminD" },
-                new PillsTypes { Id = 3, Name = "Denicit", MaxAllowed = 5 }
+                new PillsTypes { Id = 1, Name = "Magnesium", CreatedAt = DateTime.Now, CreatedBy = "System"},
+                new PillsTypes { Id = 2, Name = "VitaminD", CreatedAt = DateTime.Now, CreatedBy = "System" },
+                new PillsTypes { Id = 3, Name = "Denicit", MaxAllowed = 5, CreatedAt = DateTime.Now, CreatedBy = "System" }
             );
+
+            modelBuilder.Entity<PillsTaken>().HasQueryFilter(p => !p.IsDeleted);
+            modelBuilder.Entity<PillsTypes>().HasQueryFilter(p => !p.IsDeleted);
         }
     }
 }

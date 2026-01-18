@@ -6,6 +6,8 @@ using Pills.Common;
 using Microsoft.AspNetCore.Authorization;
 using Pills.Identity;
 using Pills.Controllers.Filters;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace Pills.Controllers
 {
@@ -15,12 +17,15 @@ namespace Pills.Controllers
         private readonly AppDbContext _dbContext;
         private readonly IPillService _pillService;
         private readonly ILogger<PillsTypesController> _logger;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public PillsTypesController(AppDbContext dbContext, IPillService pillService, ILogger<PillsTypesController> logger)
+        public PillsTypesController(AppDbContext dbContext, IPillService pillService, ILogger<PillsTypesController> logger, 
+            UserManager<ApplicationUser> userManager)
         {
             _dbContext = dbContext;
             _pillService = pillService;
             _logger = logger;
+            _userManager = userManager;
         }
 
         // GET
@@ -40,7 +45,8 @@ namespace Pills.Controllers
 
             try
             {
-                var result = await _pillService.CreatePillTypeAsync(model.Name, model.MaxAllowed);
+                var result = await _pillService.CreatePillTypeAsync(model.Name, model.MaxAllowed, 
+                    User?.FindFirstValue(ClaimTypes.NameIdentifier));
 
                 switch (result.Status)
                 {
@@ -109,7 +115,7 @@ namespace Pills.Controllers
         [ServiceFilter(typeof(AdminAuditFilter))]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var result = await _pillService.DeletePillTypeAsync(id);
+            var result = await _pillService.DeletePillTypeAsync(id, User.FindFirstValue(ClaimTypes.NameIdentifier));
 
             switch(result.Status)
             {
@@ -157,7 +163,8 @@ namespace Pills.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var result = await _pillService.EditPillAsync(model.Id, model.Name, model.MaxAllowed);
+            var result = await _pillService.EditPillAsync(model.Id, model.Name, model.MaxAllowed, 
+                User.FindFirstValue(ClaimTypes.NameIdentifier));
 
             switch(result.Status)
             {
