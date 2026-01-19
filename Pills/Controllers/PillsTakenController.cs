@@ -77,7 +77,7 @@ namespace Pills.Controllers
 
         public async Task<IActionResult> History(int page = 1)
         {
-            const int pageSize = 2;
+            const int pageSize = 10;
 
             var user = User.FindFirstValue(ClaimTypes.NameIdentifier);
 

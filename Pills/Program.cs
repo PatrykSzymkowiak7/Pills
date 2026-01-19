@@ -1,4 +1,3 @@
-using AspNetCoreGeneratedDocument;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Pills;
@@ -6,8 +5,6 @@ using Pills.Controllers.Filters;
 using Pills.Identity;
 using Pills.Services.Implementations;
 using Pills.Services.Interfaces;
-using System.Configuration;
-using System.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +40,7 @@ builder.Services.AddAuthentication().AddGoogle(googleOptions =>
 
 builder.Services.AddScoped<IPillService, PillService>();
 builder.Services.AddScoped<AdminAuditFilter>();
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
 
