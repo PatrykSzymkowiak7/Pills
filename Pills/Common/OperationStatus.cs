@@ -8,6 +8,6 @@
         InvalidData,
         MaxLimitReached,
         Error,
-        InvalidUser
+        Unauthorized
     }
 }

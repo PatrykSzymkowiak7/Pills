@@ -8,6 +8,8 @@ using Pills.Identity;
 using Pills.Controllers.Filters;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
+using Org.BouncyCastle.Asn1.Mozilla;
+using System.Runtime.CompilerServices;
 
 namespace Pills.Controllers
 {
@@ -51,23 +53,23 @@ namespace Pills.Controllers
                 switch (result.Status)
                 {
                     case OperationStatus.Success:
-                        TempData[TempDataKeys.Success] = "Operacja przebiegła pomyślnie";
+                        TempData[TempDataKeys.Success] = "The operation was successful";
                         break;
 
                     case OperationStatus.AlreadyExists:
-                        TempData[TempDataKeys.Error] = "Tabletka o takiej nazwie już istnieje";
+                        TempData[TempDataKeys.Error] = "The pill with the same name already exists";
                         break;
 
                     case OperationStatus.Error:
-                        TempData[TempDataKeys.Error] = "Wystąpił błąd podczas dodawania typu tabletki";
+                        TempData[TempDataKeys.Error] = "An error occured";
                         break;
 
                     case OperationStatus.InvalidData:
-                        TempData[TempDataKeys.Error] = "Wprowadzono niepoprawne dane";
+                        TempData[TempDataKeys.Error] = "The data entered is incorrect";
                         break;
 
                     default:
-                        throw new InvalidOperationException($"Wystąpił nieobsłużony wyjątek: {result}");
+                        throw new InvalidOperationException($"An unhandled exception occured: {result}");
                 }
             }
             catch(Exception ex)
@@ -82,6 +84,7 @@ namespace Pills.Controllers
         public async Task<IActionResult> PillTypeHub()
         {
             var model = await _dbContext.PillsTypes
+                .IgnoreQueryFilters()
                 .AsNoTracking()
                 .Select(pt => 
                 new PillTypeHubViewModel
@@ -89,7 +92,8 @@ namespace Pills.Controllers
                     Id = pt.Id,
                     Name = pt.Name,
                     Count = _dbContext.PillsTaken.Where(pta => pta.PillType.Id == pt.Id).Count(),
-                    MaxAllowed = pt.MaxAllowed
+                    MaxAllowed = pt.MaxAllowed,
+                    IsDeleted = pt.IsDeleted
                 }).ToListAsync();
 
             return View(model);
@@ -97,12 +101,16 @@ namespace Pills.Controllers
 
         public async Task<IActionResult> ConfirmDelete(int id)
         {
-            var pillType = await _dbContext.PillsTypes.Where(pt => pt.Id == id).Select(pt => new DeletePillTypeViewModel
-            {
-                Id = pt.Id,
-                Name = pt.Name,
-                Count = _dbContext.PillsTaken.Where(pta => pta.PillType.Id == pt.Id).Count()
-            }).SingleOrDefaultAsync();
+            var pillType = await _dbContext.PillsTypes
+                .Where(pt => pt.Id == id)
+                .Select(pt => new DeletePillTypeViewModel
+                    {
+                        Id = pt.Id,
+                        Name = pt.Name,
+                        Count = _dbContext.PillsTaken
+                            .Where(pta => pta.PillTypeId == pt.Id)
+                            .Count()
+                    }).SingleOrDefaultAsync();
 
             if (pillType == null)
                 return NotFound();
@@ -120,19 +128,19 @@ namespace Pills.Controllers
             switch(result.Status)
             {
                 case OperationStatus.Success:
-                    TempData[TempDataKeys.Success] = "Operacja przebiegła pomyślnie";
+                    TempData[TempDataKeys.Success] = "The operation was successful";
                     break;
 
                 case OperationStatus.NotFound:
-                    TempData[TempDataKeys.Error] = "Nie znaleziono takiej tabletki";
+                    TempData[TempDataKeys.Error] = "Pill not found";
                     break;
 
                 case OperationStatus.Error:
-                    TempData[TempDataKeys.Error] = "Wystąpił błąd podczas usuwania tabletki";
+                    TempData[TempDataKeys.Error] = "An error during deletion occured";
                     break;
 
                 default:
-                    throw new InvalidOperationException($"Wystąpił nieobsłużony wyjątek: {result}");
+                    throw new InvalidOperationException($"An unhandled exception occured: {result}");
             }
 
             return RedirectToAction(nameof(PillTypeHub));
@@ -149,7 +157,7 @@ namespace Pills.Controllers
             {
                 Id = pillType.Id,
                 Name = pillType.Name,
-                MaxAllowed = pillType.MaxAllowed
+                MaxAllowed = pillType.MaxAllowed,
             };
 
             return View(model);
@@ -169,18 +177,61 @@ namespace Pills.Controllers
             switch(result.Status)
             {
                 case OperationStatus.NotFound:
-                    TempData[TempDataKeys.Error] = "Nie znaleziono takiej tabletki";
+                    TempData[TempDataKeys.Error] = "Pill type not found";
                     break;
 
                 case OperationStatus.Success:
-                    TempData[TempDataKeys.Success] = "Operacja przebiegła pomyślnie";
+                    TempData[TempDataKeys.Success] = "Pill type updated";
                     break;
 
                 default:
-                    throw new InvalidOperationException($"Wystąpił nieobsłużony wyjątek: {result.Status}");
+                    throw new InvalidOperationException($"An unhandled exception occured: {result.Status}");
             }
 
-            TempData[TempDataKeys.Success] = "Tabletka zaktualizowana";
+            return RedirectToAction(nameof(PillTypeHub));
+        }
+
+        public async Task<IActionResult> ConfirmRestore(int id)
+        {
+            var model = await _dbContext.PillsTypes
+                .IgnoreQueryFilters()
+                .Where(p => p.Id == id)
+                .Select(pt => new RestorePillTypeViewModel
+                {
+                    Id = pt.Id,
+                    Name = pt.Name,
+                    MaxAllowed = pt.MaxAllowed,
+                    Count = _dbContext.PillsTaken
+                        .IgnoreQueryFilters()
+                        .Where(pta => pta.PillTypeId == pt.Id)
+                        .Count()
+                }).SingleOrDefaultAsync();
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ServiceFilter(typeof(AdminAuditFilter))]
+        public async Task<IActionResult> RestoreConfirmed(int id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var result = await _pillService.RestorePillTypeAsync(id, userId);
+
+            switch(result.Status)
+            {
+                case OperationStatus.Success:
+                    TempData[TempDataKeys.Success] = "The operation was successful";
+                    break;
+
+                case OperationStatus.NotFound:
+                    TempData[TempDataKeys.Error] = "Pill type not found";
+                    break;
+
+                default:
+                    throw new InvalidOperationException($"An unhandled exception occured: {result.Status}");
+            }
 
             return RedirectToAction(nameof(PillTypeHub));
         }

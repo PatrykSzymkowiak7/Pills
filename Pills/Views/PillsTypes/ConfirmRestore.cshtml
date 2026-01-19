@@ -1,19 +1,19 @@
 ﻿@using Pills.Models.ViewModels.PillTypes
-@model DeletePillTypeViewModel
+@model RestorePillTypeViewModel
 
-<h2>Are you sure you want remove this pill type?</h2>
+<h2>Are you sure you want restore this pill type?</h2>
 
 <div class="alert alert-warning">
     <strong>@Model.Name</strong><br />
     Taken <strong>@Model.Count</strong> times
 </div>
 
-<form asp-action="DeleteConfirmed" method="post">
+<form asp-action="RestoreConfirmed" method="post">
     @Html.AntiForgeryToken()
     <input type="hidden" name="id" value="@Model.Id" />
-    
-    <button type="submit" class="btn btn-danger">
-        Delete
+
+    <button type="submit" class="btn btn-info">
+        Restore
     </button>
 
     <a asp-action="PillTypeHub" class="btn btn-secondary">
