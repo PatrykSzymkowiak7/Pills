@@ -91,18 +91,9 @@ namespace Pills.Controllers
         // GET
         public async Task<IActionResult> PillTypeHub()
         {
-            var model = await _dbContext.PillsTypes
-                .IgnoreQueryFilters()
-                .AsNoTracking()
-                .Select(pt => 
-                new PillTypeHubViewModel
-                {
-                    Id = pt.Id,
-                    Name = pt.Name,
-                    Count = _dbContext.PillsTaken.Where(pta => pta.PillType.Id == pt.Id).Count(),
-                    MaxAllowed = pt.MaxAllowed,
-                    IsDeleted = pt.IsDeleted
-                }).ToListAsync();
+            var pillTypeHubDto = await _pillService.GetAllPillTypesForHubAsync();
+
+            var model = _mapper.Map<List<PillTypeHubViewModel>>(pillTypeHubDto);
 
             return View(model);
         }

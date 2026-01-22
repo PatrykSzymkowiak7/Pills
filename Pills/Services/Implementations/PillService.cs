@@ -5,6 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using Pills.Models.DTOs.PillTypes;
 using Pills.Models.DTOs.PillTaken;
+using Microsoft.Extensions.Caching.Memory;
+using Pills.Common.Cache;
+using System.Collections.Generic;
 
 namespace Pills.Services.Implementations
 {
@@ -13,12 +16,15 @@ namespace Pills.Services.Implementations
         private readonly AppDbContext _dbContext;
         private readonly ILogger<PillService> _logger;
         private readonly IMapper _mapper;
+        private readonly IMemoryCache _cache;
 
-        public PillService(AppDbContext dbContext, ILogger<PillService> logger, IMapper mapper)
+        public PillService(AppDbContext dbContext, ILogger<PillService> logger, 
+            IMapper mapper, IMemoryCache cache)
         {
             _dbContext = dbContext;
             _logger = logger;
             _mapper = mapper;
+            _cache = cache;
         }
 
         public async Task<OperationResult<PillTypeDto>> CreatePillTypeAsync(CreatePillTypeDto dto, string userId)
@@ -43,6 +49,8 @@ namespace Pills.Services.Implementations
 
             var pillTypeDto = _mapper.Map<PillTypeDto>(pillType);
 
+            _cache.Remove(CacheKeys.PillTypes);
+
             return OperationResult<PillTypeDto>.Ok(pillTypeDto);
         }
 
@@ -64,6 +72,8 @@ namespace Pills.Services.Implementations
 
             _dbContext.Remove(pillType);
             await _dbContext.SaveChangesAsync();
+
+            _cache.Remove(CacheKeys.PillTypes);
 
             return OperationResult<bool>.Ok(true);
         }
@@ -114,6 +124,8 @@ namespace Pills.Services.Implementations
 
             var pillDto = _mapper.Map<PillTypeDto>(pillType);
 
+            _cache.Remove(CacheKeys.PillTypes);
+
             return OperationResult<PillTypeDto>.Ok(pillDto);
         }
 
@@ -135,7 +147,40 @@ namespace Pills.Services.Implementations
 
             var dto = _mapper.Map<PillTypeDto>(pillType);
 
+            _cache.Remove(CacheKeys.PillTypes);
+
             return OperationResult<PillTypeDto>.Ok(dto);
+        }
+
+        public async Task<IReadOnlyList<PillTypeHubDto>> GetAllPillTypesForHubAsync()
+        {
+            if(_cache.TryGetValue(CacheKeys.PillTypes, out List<PillTypeHubDto> cached))
+            {
+                return cached;
+            }
+
+            var data = await _dbContext.PillsTypes
+                .IgnoreQueryFilters()
+                .Select(p => new PillTypeHubDto
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    MaxAllowed = p.MaxAllowed,
+                    IsDeleted = p.IsDeleted,
+                    TakenCount = _dbContext.PillsTaken
+                        .IgnoreQueryFilters()
+                        .Count(pta => pta.PillTypeId == p.Id)
+                }).ToListAsync();
+
+            _cache.Set(CacheKeys.PillTypes,
+                data,
+                new MemoryCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2),
+                    SlidingExpiration = TimeSpan.FromMinutes(1)
+                });
+
+            return data;
         }
     }
 }

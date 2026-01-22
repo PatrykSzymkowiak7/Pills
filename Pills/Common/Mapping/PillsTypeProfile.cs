@@ -24,6 +24,8 @@ namespace Pills.Common.Mapping
                     opt => opt.MapFrom(src => src.Name.Trim()));
 
             CreateMap<EditPillTypeDto, PillsTypes>();
+
+            CreateMap<PillTypeHubDto, PillTypeHubViewModel>();
         }
     }
 }
