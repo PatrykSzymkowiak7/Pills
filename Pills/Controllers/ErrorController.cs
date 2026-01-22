@@ -1,9 +1,27 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Pills.Controllers
 {
     public class ErrorController : Controller
     {
+        private readonly ILogger<ErrorController> _logger;
+
+        ErrorController(ILogger<ErrorController> logger)
+        {
+            _logger = logger;
+        }
+
+        [Route("Error")]
+        public IActionResult Error()
+        {
+            var exception = HttpContext.Features.Get<IExceptionHandlerFeature>();
+
+            _logger.LogError(exception?.Error, "Unhandled exception");
+
+            return View("Error");
+        }
+
         [Route("Error/{statusCode}")]
         public IActionResult HttpStatusCodeHandler(int statusCode)
         {

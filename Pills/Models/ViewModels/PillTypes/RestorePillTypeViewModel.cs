@@ -1,7 +1,10 @@
-﻿namespace Pills.Models.ViewModels.PillTypes
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Pills.Models.ViewModels.PillTypes
 {
     public class RestorePillTypeViewModel
     {
+        [Required]
         public int Id { get; set; }
         public string Name { get; set; }
         public int Count { get; set; }
