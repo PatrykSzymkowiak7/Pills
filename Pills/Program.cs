@@ -8,6 +8,12 @@ using Pills.Services.Implementations;
 using Pills.Services.Interfaces;
 using FluentValidation.AspNetCore;
 using Pills.Validators;
+using Pills.Extensions;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using System.Text.Json;
+using Pills.HealthChecks;
+using AutoMapper;
+using Pills.Common.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,28 +52,32 @@ builder.Services.AddAuthentication().AddGoogle(googleOptions =>
     googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
 });
 
-builder.Services.AddScoped<IPillService, PillService>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<AdminAuditFilter>();
-builder.Services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-builder.Services.AddHttpContextAccessor();
+builder.Services.AddApplicationServices();
 
 var app = builder.Build();
 
-using(var scope = app.Services.CreateScope())
-{
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    string[] roles = { "Admin", "User" };
+await app.SeedAsync();
 
-    foreach(var role in roles)
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+    ResponseWriter = async (context, report) =>
     {
-        if(!await roleManager.RoleExistsAsync(role))
+        context.Response.ContentType = "application/json";
+
+        var result = new
         {
-            await roleManager.CreateAsync(new IdentityRole(role));
-        }
+            status = report.Status.ToString(),
+            checks = report.Entries.Select(e => new
+            {
+                name = e.Key,
+                status = e.Value.Status.ToString(),
+                description = e.Value.Description
+            })
+        };
+
+        await context.Response.WriteAsync(JsonSerializer.Serialize(result));
     }
-}
+});
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

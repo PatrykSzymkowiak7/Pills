@@ -12,5 +12,6 @@ namespace Pills.Services.Interfaces
         Task<OperationResult<PillTypeDto>> CreatePillTypeAsync(CreatePillTypeDto dto, string userId);
         Task<OperationResult<PillTypeDto>> EditPillAsync(EditPillTypeDto dto, string userId);
         Task<OperationResult<PillTypeDto>> RestorePillTypeAsync(int pillTypeId, string userId);
+        Task<IReadOnlyList<PillTypeHubDto>> GetAllPillTypesForHubAsync();
     }
 }

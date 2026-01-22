@@ -9,6 +9,7 @@ using System.Security.Claims;
 using Org.BouncyCastle.Asn1.X509.Qualified;
 using Microsoft.AspNetCore.Razor.Language.Intermediate;
 using Pills.Services.Interfaces;
+using Microsoft.CodeAnalysis;
 
 namespace Pills
 {
