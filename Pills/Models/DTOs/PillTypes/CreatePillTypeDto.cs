@@ -1,4 +1,4 @@
-﻿namespace Pills.Models.DTOs
+﻿namespace Pills.Models.DTOs.PillTypes
 {
     public class CreatePillTypeDto
     {

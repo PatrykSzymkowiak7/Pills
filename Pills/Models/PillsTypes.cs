@@ -1,19 +1,27 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Pills.Common;
+using System.ComponentModel.DataAnnotations;
 
 namespace Pills.Models
 {
-    public class PillsTypes
+    public class PillsTypes : IAuditableEntity
     {
         [Key]
         public int Id { get; set; }
+        [Required]
         public string Name { get; set; }
         public bool MultiplePerDayAllowed => MaxAllowed > 1;
         public int MaxAllowed { get; set; } = 1;
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
-        public DateTime EditedAt { get; set; }
-        public string CreatedBy { get; set; } = "System";
+
+        #region Audit fields
+
+        public DateTime CreatedAt { get; set; }
+        public string CreatedBy { get; set; }
+        public DateTime? EditedAt { get; set; }
         public string? EditedBy { get; set; }
-        public bool IsDeleted { get; set; } = false;
-        public string DeletedBy { get; set; } = "System";
+        public bool IsDeleted { get; set; }
+        public DateTime? DeletedAt { get; set; }
+        public string? DeletedBy { get; set; }
+
+        #endregion
     }
 }

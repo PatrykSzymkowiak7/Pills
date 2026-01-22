@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Pills;
 
@@ -11,9 +12,11 @@ using Pills;
 namespace Pills.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260120101440_Model-Fix-NotNulls")]
+    partial class ModelFixNotNulls
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -230,26 +233,10 @@ namespace Pills.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime(6)");
-
                     b.Property<string>("DeletedBy")
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime?>("EditedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("EditedBy")
                         .HasColumnType("longtext");
 
                     b.Property<bool>("IsDeleted")
@@ -286,9 +273,6 @@ namespace Pills.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime(6)");
-
                     b.Property<string>("DeletedBy")
                         .HasColumnType("longtext");
 
@@ -299,9 +283,7 @@ namespace Pills.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("tinyint(1)")
-                        .HasDefaultValue(false);
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<int>("MaxAllowed")
                         .HasColumnType("int");
@@ -318,7 +300,7 @@ namespace Pills.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2026, 1, 20, 16, 9, 31, 28, DateTimeKind.Local).AddTicks(9740),
+                            CreatedAt = new DateTime(2026, 1, 20, 11, 14, 40, 233, DateTimeKind.Local).AddTicks(3878),
                             CreatedBy = "System",
                             IsDeleted = false,
                             MaxAllowed = 1,
@@ -327,7 +309,7 @@ namespace Pills.Migrations
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2026, 1, 20, 16, 9, 31, 28, DateTimeKind.Local).AddTicks(9779),
+                            CreatedAt = new DateTime(2026, 1, 20, 11, 14, 40, 233, DateTimeKind.Local).AddTicks(3882),
                             CreatedBy = "System",
                             IsDeleted = false,
                             MaxAllowed = 1,
@@ -336,7 +318,7 @@ namespace Pills.Migrations
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2026, 1, 20, 16, 9, 31, 28, DateTimeKind.Local).AddTicks(9781),
+                            CreatedAt = new DateTime(2026, 1, 20, 11, 14, 40, 233, DateTimeKind.Local).AddTicks(3884),
                             CreatedBy = "System",
                             IsDeleted = false,
                             MaxAllowed = 5,

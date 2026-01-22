@@ -8,6 +8,8 @@ using Pills.Models;
 using Pills.Models.ViewModels.PillsTaken;
 using Pills.Services.Interfaces;
 using System.Security.Claims;
+using Pills.Models.DTOs;
+using Pills.Models.DTOs.PillTaken;
 
 namespace Pills.Controllers
 {
@@ -18,21 +20,20 @@ namespace Pills.Controllers
         private readonly IPillService _pillService;
         private readonly ILogger<PillsTakenController> _logger;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly IUserService _userService;
 
         public PillsTakenController(AppDbContext dbContext, IPillService pillService, 
-            ILogger<PillsTakenController> logger, SignInManager<ApplicationUser> signInManager)
+            ILogger<PillsTakenController> logger, SignInManager<ApplicationUser> signInManager, IUserService userService)
         {
             _dbContext = dbContext;
             _pillService = pillService;
             _logger = logger;
             _signInManager = signInManager;
+            _userService = userService;
         }
 
         public async Task<IActionResult> Today()
         {
-            var today = DateTime.Today;
-            var user = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
             var model = await _dbContext.PillsTypes.Select(pt => new TodayPillViewModel
             {
                 PillTypeId = pt.Id,
@@ -40,8 +41,8 @@ namespace Pills.Controllers
                 MaxAllowed = pt.MaxAllowed,
                 TakenCountToday = _dbContext.PillsTaken.Count(p => 
                     p.PillType.Id == pt.Id && 
-                    p.Date == today &&
-                    p.UserId == user)
+                    p.Date.Date == DateTime.UtcNow.Date &&
+                    p.UserId == _userService.UserId)
             }).ToListAsync();
 
             return View(model);
@@ -51,9 +52,14 @@ namespace Pills.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Take(int pillTypeId)
         {
-            var user = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = _userService.UserId;
+            var dto = new TakePillDto
+            {
+                PillTypeId = pillTypeId,
+                Date = DateTime.Now
+            };
 
-            var result = await _pillService.TakePillAsync(pillTypeId, DateTime.Today, user);
+            var result = await _pillService.TakePillAsync(dto, user);
 
             switch (result.Status)
             {
@@ -79,7 +85,7 @@ namespace Pills.Controllers
         {
             const int pageSize = 10;
 
-            var user = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = _userService.UserId;
 
             var query = await _dbContext.PillsTaken
                 .Include(pt => pt.PillType)

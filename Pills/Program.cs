@@ -1,15 +1,22 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Pills;
+using Pills.Common;
 using Pills.Controllers.Filters;
 using Pills.Identity;
 using Pills.Services.Implementations;
 using Pills.Services.Interfaces;
+using FluentValidation.AspNetCore;
+using Pills.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+    .AddFluentValidation(fv =>
+    {
+        fv.RegisterValidatorsFromAssemblyContaining<CreatePillTypeValidator>();
+    });
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(
@@ -21,6 +28,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false;
+
 })
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<AppDbContext>();
@@ -39,8 +47,11 @@ builder.Services.AddAuthentication().AddGoogle(googleOptions =>
 });
 
 builder.Services.AddScoped<IPillService, PillService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<AdminAuditFilter>();
+builder.Services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
@@ -61,12 +72,15 @@ using(var scope = app.Services.CreateScope())
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
+    app.UseExceptionHandler("/Error");
+    app.UseStatusCodePagesWithReExecute("/Error/{0}");
     app.UseHsts();
 }
 else
 {
-    app.UseDeveloperExceptionPage();
+    app.UseExceptionHandler("/Error");
+    app.UseStatusCodePagesWithReExecute("/Error/{0}");
+    //app.UseDeveloperExceptionPage();
 }
 
 app.UseHttpsRedirection();

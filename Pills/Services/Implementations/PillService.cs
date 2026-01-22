@@ -3,7 +3,8 @@ using Pills.Services.Interfaces;
 using Pills.Common;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
-using Pills.Models.DTOs;
+using Pills.Models.DTOs.PillTypes;
+using Pills.Models.DTOs.PillTaken;
 
 namespace Pills.Services.Implementations
 {
@@ -54,8 +55,6 @@ namespace Pills.Services.Implementations
             if (pillType == null || pillType.IsDeleted)
                 return OperationResult<bool>.Fail(OperationStatus.NotFound);
 
-            pillType.IsDeleted = true;
-
             await _dbContext.PillsTaken
                 .IgnoreQueryFilters()
                 .Where(pt => pt.PillTypeId == pillTypeId)
@@ -63,58 +62,59 @@ namespace Pills.Services.Implementations
                 .SetProperty(p => p.IsDeleted, true)
                 .SetProperty(p => p.DeletedBy, userId));
 
+            _dbContext.Remove(pillType);
             await _dbContext.SaveChangesAsync();
 
             return OperationResult<bool>.Ok(true);
         }
 
-        public async Task<OperationResult<PillTypeDto>> TakePillAsync(int pillTypeId, DateTime date, string userId)
+        public async Task<OperationResult<PillTakenDto>> TakePillAsync(TakePillDto dto, string userId)
         {
             if (userId == null)
-                return OperationResult<PillTypeDto>.Fail(OperationStatus.InvalidUser);
+                return OperationResult<PillTakenDto>.Fail(OperationStatus.Unauthorized);
 
-            var pillType = await _dbContext.PillsTypes.SingleOrDefaultAsync(pt => pt.Id == pillTypeId);
+            var pillType = await _dbContext.PillsTypes.SingleOrDefaultAsync(pt => pt.Id == dto.PillTypeId);
 
             if (pillType == null)
-                return OperationResult<PillTypeDto>.Fail(OperationStatus.NotFound);
+                return OperationResult<PillTakenDto>.Fail(OperationStatus.NotFound);
 
             var takenCount = await _dbContext.PillsTaken.CountAsync(pt =>
-                pt.PillType.Id == pillTypeId &&
-                pt.Date == date &&
+                pt.PillType.Id == dto.PillTypeId &&
+                pt.Date.Date == dto.Date.Date &&
                 pt.UserId == userId);
 
             if (takenCount >= pillType.MaxAllowed)
-                return OperationResult<PillTypeDto>.Fail(OperationStatus.MaxLimitReached);
+                return OperationResult<PillTakenDto>.Fail(OperationStatus.MaxLimitReached);
 
-            var pillTaken = new PillsTaken
-            {
-                Date = date,
-                PillType = pillType,
-                UserId = userId
-            };
+            var pillTaken = _mapper.Map<PillsTaken>(dto);
+            pillTaken.UserId = userId;
 
             _dbContext.PillsTaken.Add(pillTaken);
 
             await _dbContext.SaveChangesAsync();
 
-            return OperationResult<PillTypeDto>.Ok(pillTaken);
+            var pillTakenDto = _mapper.Map<PillTakenDto>(pillTaken);
+
+            return OperationResult<PillTakenDto>.Ok(pillTakenDto);
         }
 
-        public async Task<OperationResult<PillTypeDto>> EditPillAsync(int id, string name, int maxAllowed, string userId)
+        public async Task<OperationResult<PillTypeDto>> EditPillAsync(EditPillTypeDto dto, string userId)
         {
-            var pillType = await _dbContext.PillsTypes.SingleOrDefaultAsync(p => p.Id == id);
+            var pillType = await _dbContext.PillsTypes.SingleOrDefaultAsync(p => p.Id == dto.Id);
 
             if (pillType == null)
                 return OperationResult<PillTypeDto>.Fail(OperationStatus.NotFound);
 
-            pillType.Name = name;
-            pillType.MaxAllowed = maxAllowed;
+            pillType.Name = dto.Name;
+            pillType.MaxAllowed = dto.MaxAllowed;
             pillType.EditedBy = userId;
             pillType.EditedAt = DateTime.Now;
 
             await _dbContext.SaveChangesAsync();
 
-            return OperationResult<PillTypeDto>.Ok(pillType);
+            var pillDto = _mapper.Map<PillTypeDto>(pillType);
+
+            return OperationResult<PillTypeDto>.Ok(pillDto);
         }
 
         public async Task<OperationResult<PillTypeDto>> RestorePillTypeAsync(int pillTypeId, string userId)
@@ -133,7 +133,9 @@ namespace Pills.Services.Implementations
 
             await _dbContext.SaveChangesAsync();
 
-            return OperationResult<PillTypeDto>.Ok(pillType);
+            var dto = _mapper.Map<PillTypeDto>(pillType);
+
+            return OperationResult<PillTypeDto>.Ok(dto);
         }
     }
 }

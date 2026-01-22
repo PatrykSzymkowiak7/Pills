@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using Org.BouncyCastle.Asn1.Mozilla;
 using System.Runtime.CompilerServices;
+using AutoMapper;
+using Pills.Models.DTOs.PillTypes;
 
 namespace Pills.Controllers
 {
@@ -20,14 +22,18 @@ namespace Pills.Controllers
         private readonly IPillService _pillService;
         private readonly ILogger<PillsTypesController> _logger;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IMapper _mapper;
+        private readonly IUserService _userService;
 
         public PillsTypesController(AppDbContext dbContext, IPillService pillService, ILogger<PillsTypesController> logger, 
-            UserManager<ApplicationUser> userManager)
+            UserManager<ApplicationUser> userManager, IMapper mapper, IUserService userService)
         {
             _dbContext = dbContext;
             _pillService = pillService;
             _logger = logger;
             _userManager = userManager;
+            _mapper = mapper;
+            _userService = userService;
         }
 
         // GET
@@ -47,8 +53,10 @@ namespace Pills.Controllers
 
             try
             {
-                var result = await _pillService.CreatePillTypeAsync(model.Name, model.MaxAllowed, 
-                    User?.FindFirstValue(ClaimTypes.NameIdentifier));
+                var dto = _mapper.Map<CreatePillTypeDto>(model);
+                var userId = _userService.UserId;
+
+                var result = await _pillService.CreatePillTypeAsync(dto, userId);
 
                 switch (result.Status)
                 {
@@ -123,7 +131,8 @@ namespace Pills.Controllers
         [ServiceFilter(typeof(AdminAuditFilter))]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var result = await _pillService.DeletePillTypeAsync(id, User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userId = _userService.UserId;
+            var result = await _pillService.DeletePillTypeAsync(id, userId);
 
             switch(result.Status)
             {
@@ -171,21 +180,30 @@ namespace Pills.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var result = await _pillService.EditPillAsync(model.Id, model.Name, model.MaxAllowed, 
-                User.FindFirstValue(ClaimTypes.NameIdentifier));
-
-            switch(result.Status)
+            try
             {
-                case OperationStatus.NotFound:
-                    TempData[TempDataKeys.Error] = "Pill type not found";
-                    break;
+                var userId = _userService.UserId;
+                var dto = _mapper.Map<EditPillTypeDto>(model);
 
-                case OperationStatus.Success:
-                    TempData[TempDataKeys.Success] = "Pill type updated";
-                    break;
+                var result = await _pillService.EditPillAsync(dto, userId);
 
-                default:
-                    throw new InvalidOperationException($"An unhandled exception occured: {result.Status}");
+                switch (result.Status)
+                {
+                    case OperationStatus.NotFound:
+                        TempData[TempDataKeys.Error] = "Pill type not found";
+                        break;
+
+                    case OperationStatus.Success:
+                        TempData[TempDataKeys.Success] = "Pill type updated";
+                        break;
+
+                    default:
+                        throw new InvalidOperationException($"An unhandled exception occured: {result.Status}");
+                }
+            }
+            catch(Exception)
+            {
+                return StatusCode(500);
             }
 
             return RedirectToAction(nameof(PillTypeHub));
@@ -215,7 +233,7 @@ namespace Pills.Controllers
         [ServiceFilter(typeof(AdminAuditFilter))]
         public async Task<IActionResult> RestoreConfirmed(int id)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = _userService.UserId;
 
             var result = await _pillService.RestorePillTypeAsync(id, userId);
 
