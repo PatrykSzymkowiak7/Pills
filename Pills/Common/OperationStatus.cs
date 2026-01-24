@@ -8,6 +8,7 @@
         InvalidData,
         MaxLimitReached,
         Error,
-        Unauthorized
+        Unauthorized,
+        FeatureDisabled
     }
 }

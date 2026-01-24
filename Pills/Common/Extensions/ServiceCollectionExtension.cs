@@ -1,10 +1,10 @@
-﻿using Pills.Common;
+﻿using Pills.Common.HealthChecks;
+using Pills.Common.Interfaces;
 using Pills.Controllers.Filters;
-using Pills.HealthChecks;
 using Pills.Services.Implementations;
 using Pills.Services.Interfaces;
 
-namespace Pills.Extensions
+namespace Pills.Common.Extensions
 {
     public static class ServiceCollectionExtension
     {

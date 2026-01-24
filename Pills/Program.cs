@@ -2,18 +2,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Pills;
 using Pills.Common;
-using Pills.Controllers.Filters;
 using Pills.Identity;
-using Pills.Services.Implementations;
-using Pills.Services.Interfaces;
 using FluentValidation.AspNetCore;
-using Pills.Validators;
-using Pills.Extensions;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using System.Text.Json;
-using Pills.HealthChecks;
-using AutoMapper;
-using Pills.Common.Mapping;
+using Pills.Common.Extensions;
+using Pills.Common.Validators;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,12 +47,32 @@ builder.Services.AddAuthentication().AddGoogle(googleOptions =>
     googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
 });
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(Policies.CanManagePillTypes, policy => policy.RequireRole(UserRoles.Admin));
+});
+
+// Custom extension method
 builder.Services.AddApplicationServices();
+builder.Services.Configure<FeatureFlags>(
+    builder.Configuration.GetSection("Featuers"));
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddPolicy("login", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(1)
+            }));
+});
 
 var app = builder.Build();
 
 await app.SeedAsync();
-
+app.UseRateLimiter();
 app.MapHealthChecks("/health", new HealthCheckOptions
 {
     ResponseWriter = async (context, report) =>
@@ -101,6 +116,7 @@ app.UseRouting();
 app.UseStatusCodePagesWithReExecute("/Error/{0}");
 
 app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.MapControllerRoute(

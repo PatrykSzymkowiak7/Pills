@@ -10,6 +10,7 @@ using Pills.Services.Interfaces;
 using System.Security.Claims;
 using Pills.Models.DTOs;
 using Pills.Models.DTOs.PillTaken;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Pills.Controllers
 {
@@ -81,27 +82,40 @@ namespace Pills.Controllers
             return RedirectToAction(nameof(Today));
         }
 
-        public async Task<IActionResult> History(int page = 1)
+        public async Task<IActionResult> History(int page = 1, int? pillTypeId = null)
         {
             const int pageSize = 10;
 
-            var user = _userService.UserId;
+            var userId = _userService.UserId;
 
-            var query = await _dbContext.PillsTaken
-                .Include(pt => pt.PillType)
-                .Where(p => p.UserId == user)
-                .ToListAsync();
+            var baseQuery = _dbContext.PillsTaken
+                .Where(pt => pt.UserId == userId);
 
-            var grouped = query
-                .AsEnumerable()
-                .GroupBy(p => p.Date.Date)
-                .OrderByDescending(g => g.Key);
+            if(pillTypeId.HasValue)
+                baseQuery = baseQuery.Where(p => p.PillTypeId == pillTypeId);
 
-            var totalDays = grouped.Count();
+            var daysQuery = baseQuery
+                .Select(p => p.Date.Date)
+                .Distinct()
+                .OrderByDescending(d => d);
 
-            var days = grouped
+            var totalDays = await daysQuery.CountAsync();
+
+            var pagedDays = await daysQuery
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
+                .ToListAsync();
+
+            var pills = await _dbContext.PillsTaken
+                .Include(pt => pt.PillType)
+                .Where(p => 
+                    p.UserId == userId && 
+                    pagedDays.Contains(p.Date.Date))
+                .ToListAsync();
+
+            var days = pills
+                .GroupBy(p => p.Date.Date)
+                .OrderByDescending(g => g.Key)
                 .Select(g => new HistoryDayViewModel
                 {
                     Date = g.Key,
@@ -109,17 +123,29 @@ namespace Pills.Controllers
                 })
                 .ToList();
 
-            var totalPages = (int)Math.Ceiling(totalDays / (double)pageSize);
+            var totalPages = (int)Math.Ceiling(days.Count / (double)pageSize);
 
             if (page > totalPages)
                 page = totalPages;
+
+            var pillTypes = await _dbContext.PillsTypes.ToListAsync();
+            List<SelectListItem> pillTypeSelectList = pillTypes.ConvertAll(a =>
+            {
+                return new SelectListItem()
+                {
+                    Text = a.Name,
+                    Value = a.Id.ToString(),
+                    Selected = false
+                };
+            });
 
             var model = new HistoryPagedViewModel
             {
                 Days = days,
                 CurrentPage = page,
                 PageSize = pageSize,
-                TotalPages = totalPages
+                TotalPages = totalPages,
+                PillTypes = pillTypeSelectList
             };
 
             return View(model);

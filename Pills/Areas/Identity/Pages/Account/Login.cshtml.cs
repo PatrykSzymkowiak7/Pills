@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using Pills.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Pills.Areas.Identity.Pages.Account
 {
@@ -102,6 +103,7 @@ namespace Pills.Areas.Identity.Pages.Account
             ReturnUrl = returnUrl;
         }
 
+        [EnableRateLimiting("login")]
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");

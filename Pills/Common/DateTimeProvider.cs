@@ -1,4 +1,6 @@
-﻿namespace Pills.Common
+﻿using Pills.Common.Interfaces;
+
+namespace Pills.Common
 {
     public class DateTimeProvider :IDateTimeProvider
     {

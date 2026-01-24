@@ -12,10 +12,11 @@ using Org.BouncyCastle.Asn1.Mozilla;
 using System.Runtime.CompilerServices;
 using AutoMapper;
 using Pills.Models.DTOs.PillTypes;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Pills.Controllers
 {
-    [Authorize(Roles = UserRoles.Admin)]
+    [Authorize(Policy = Policies.CanManagePillTypes)]
     public class PillsTypesController : Controller
     {
         private readonly AppDbContext _dbContext;
@@ -45,6 +46,7 @@ namespace Pills.Controllers
         // POST
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [EnableRateLimiting("login")]
         [ServiceFilter(typeof(AdminAuditFilter))]
         public async Task<IActionResult> Create(CreatePillTypeViewModel model)
         {
@@ -119,6 +121,7 @@ namespace Pills.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [EnableRateLimiting("login")]
         [ServiceFilter(typeof(AdminAuditFilter))]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
@@ -137,6 +140,10 @@ namespace Pills.Controllers
 
                 case OperationStatus.Error:
                     TempData[TempDataKeys.Error] = "An error during deletion occured";
+                    break;
+
+                case OperationStatus.FeatureDisabled:
+                    TempData[TempDataKeys.Error] = "This feature is currently disabled";
                     break;
 
                 default:
@@ -221,6 +228,7 @@ namespace Pills.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [EnableRateLimiting("login")]
         [ServiceFilter(typeof(AdminAuditFilter))]
         public async Task<IActionResult> RestoreConfirmed(int id)
         {

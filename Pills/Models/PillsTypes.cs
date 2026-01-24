@@ -1,9 +1,9 @@
-﻿using Pills.Common;
+﻿using Pills.Common.Interfaces;
 using System.ComponentModel.DataAnnotations;
 
 namespace Pills.Models
 {
-    public class PillsTypes : IAuditableEntity
+    public class PillsTypes : IAuditableEntity, ISoftDeletable
     {
         [Key]
         public int Id { get; set; }
@@ -18,6 +18,11 @@ namespace Pills.Models
         public string CreatedBy { get; set; }
         public DateTime? EditedAt { get; set; }
         public string? EditedBy { get; set; }
+
+        #endregion
+
+        #region Soft deletable
+
         public bool IsDeleted { get; set; }
         public DateTime? DeletedAt { get; set; }
         public string? DeletedBy { get; set; }
