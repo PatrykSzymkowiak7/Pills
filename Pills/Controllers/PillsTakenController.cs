@@ -44,7 +44,8 @@ namespace Pills.Controllers
                     p.PillType.Id == pt.Id && 
                     p.Date.Date == DateTime.UtcNow.Date &&
                     p.UserId == _userService.UserId)
-            }).ToListAsync();
+            })
+            .ToListAsync();
 
             return View(model);
         }
@@ -128,25 +129,23 @@ namespace Pills.Controllers
             if (page > totalPages)
                 page = totalPages;
 
-            var pillTypes = await _dbContext.PillsTypes.ToListAsync();
-            List<SelectListItem> pillTypeSelectList = pillTypes.ConvertAll(a =>
-            {
-                return new SelectListItem()
-                {
-                    Text = a.Name,
-                    Value = a.Id.ToString(),
-                    Selected = false
-                };
-            });
-
             var model = new HistoryPagedViewModel
             {
                 Days = days,
                 CurrentPage = page,
                 PageSize = pageSize,
                 TotalPages = totalPages,
-                PillTypes = pillTypeSelectList
+                SelectedPillTypeId = pillTypeId
             };
+
+            model.PillTypes = await _dbContext.PillsTypes
+                .Select(pt => new SelectListItem
+                {
+                    Value = pt.Id.ToString(),
+                    Text = pt.Name,
+                    Selected = pt.Id == pillTypeId
+                })
+                .ToListAsync();
 
             return View(model);
         }
