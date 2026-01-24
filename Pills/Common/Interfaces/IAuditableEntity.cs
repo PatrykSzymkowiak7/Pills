@@ -1,4 +1,4 @@
-﻿namespace Pills.Common
+﻿namespace Pills.Common.Interfaces
 {
     public interface IAuditableEntity
     {

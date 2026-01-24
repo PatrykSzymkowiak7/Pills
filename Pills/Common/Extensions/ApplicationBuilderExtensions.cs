@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Pills.Identity;
 
-namespace Pills.Extensions
+namespace Pills.Common.Extensions
 {
     public static class ApplicationBuilderExtensions
     {

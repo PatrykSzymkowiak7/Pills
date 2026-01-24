@@ -4,12 +4,12 @@ using Pills.Models;
 using System.Collections.Generic;
 using System.Reflection.Emit;
 using Pills.Identity;
-using Pills.Common;
 using System.Security.Claims;
 using Org.BouncyCastle.Asn1.X509.Qualified;
 using Microsoft.AspNetCore.Razor.Language.Intermediate;
 using Pills.Services.Interfaces;
 using Microsoft.CodeAnalysis;
+using Pills.Common.Interfaces;
 
 namespace Pills
 {
@@ -25,9 +25,24 @@ namespace Pills
         }
         public DbSet<PillsTaken> PillsTaken { get; set; }
         public DbSet<PillsTypes> PillsTypes { get; set; }
+        public bool IgnoreSoftDelete { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            foreach(var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                if(typeof(ISoftDeletable).IsAssignableFrom(entityType.ClrType))
+                {
+                    var method = typeof(AppDbContext)
+                        .GetMethod(nameof(ApplySoftDeleteFilter),
+                            System.Reflection.BindingFlags.NonPublic |
+                            System.Reflection.BindingFlags.Static)?
+                        .MakeGenericMethod(entityType.ClrType);
+
+                    method?.Invoke(null, new object[] { modelBuilder, this });
+                }
+            }
+
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<PillsTypes>().HasData(
@@ -59,9 +74,6 @@ namespace Pills
                     MaxAllowed = 5,
                 }
             );
-
-            modelBuilder.Entity<PillsTaken>().HasQueryFilter(p => !p.IsDeleted);
-            modelBuilder.Entity<PillsTypes>().HasQueryFilter(p => !p.IsDeleted);
 
             modelBuilder.Entity<PillsTypes>()
                 .Property(p => p.IsDeleted)
@@ -103,6 +115,12 @@ namespace Pills
             }
 
             return base.SaveChangesAsync(cancellationToken);
+        }
+
+        private static void ApplySoftDeleteFilter<TEntity>(ModelBuilder modelBuilder, AppDbContext appDbContext)
+            where TEntity : class, ISoftDeletable
+        {
+            modelBuilder.Entity<TEntity>().HasQueryFilter(e => !e.IsDeleted || appDbContext.IgnoreSoftDelete);
         }
     }
 }

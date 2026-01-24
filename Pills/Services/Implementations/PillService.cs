@@ -8,6 +8,7 @@ using Pills.Models.DTOs.PillTaken;
 using Microsoft.Extensions.Caching.Memory;
 using Pills.Common.Cache;
 using System.Collections.Generic;
+using Microsoft.Extensions.Options;
 
 namespace Pills.Services.Implementations
 {
@@ -17,14 +18,16 @@ namespace Pills.Services.Implementations
         private readonly ILogger<PillService> _logger;
         private readonly IMapper _mapper;
         private readonly IMemoryCache _cache;
+        private readonly FeatureFlags _features;
 
         public PillService(AppDbContext dbContext, ILogger<PillService> logger, 
-            IMapper mapper, IMemoryCache cache)
+            IMapper mapper, IMemoryCache cache, IOptions<FeatureFlags> options)
         {
             _dbContext = dbContext;
             _logger = logger;
             _mapper = mapper;
             _cache = cache;
+            _features = options.Value;
         }
 
         public async Task<OperationResult<PillTypeDto>> CreatePillTypeAsync(CreatePillTypeDto dto, string userId)
@@ -56,6 +59,9 @@ namespace Pills.Services.Implementations
 
         public async Task<OperationResult<bool>> DeletePillTypeAsync(int pillTypeId, string userId)
         {
+            if (!_features.EnablePillTypeDelete)
+                return OperationResult<bool>.Fail(OperationStatus.FeatureDisabled);
+
             var pillType = await _dbContext.PillsTypes
                 .IgnoreQueryFilters()
                 .SingleOrDefaultAsync(pt => pt.Id == pillTypeId);
@@ -131,8 +137,9 @@ namespace Pills.Services.Implementations
 
         public async Task<OperationResult<PillTypeDto>> RestorePillTypeAsync(int pillTypeId, string userId)
         {
+            _dbContext.IgnoreSoftDelete = true; 
+
             var pillType = await _dbContext.PillsTypes
-                .IgnoreQueryFilters()
                 .SingleOrDefaultAsync(p => p.Id == pillTypeId);
 
             if (pillType == null)
@@ -159,8 +166,9 @@ namespace Pills.Services.Implementations
                 return cached;
             }
 
+            _dbContext.IgnoreSoftDelete = true;
+
             var data = await _dbContext.PillsTypes
-                .IgnoreQueryFilters()
                 .Select(p => new PillTypeHubDto
                 {
                     Id = p.Id,
@@ -168,7 +176,6 @@ namespace Pills.Services.Implementations
                     MaxAllowed = p.MaxAllowed,
                     IsDeleted = p.IsDeleted,
                     TakenCount = _dbContext.PillsTaken
-                        .IgnoreQueryFilters()
                         .Count(pta => pta.PillTypeId == p.Id)
                 }).ToListAsync();
 

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Pills.Identity;
 
-namespace Pills.HealthChecks
+namespace Pills.Common.HealthChecks
 {
     public class AdminUserHealthCheck : IHealthCheck
     {
