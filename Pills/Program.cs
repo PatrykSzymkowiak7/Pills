@@ -1,14 +1,14 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Pills;
-using Pills.Common;
 using Pills.Identity;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using System.Text.Json;
 using Pills.Common.Extensions;
 using Pills.Common.Validators;
-using System.Threading.RateLimiting;
+using Pills.Options;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,20 +54,16 @@ builder.Services.AddAuthorization(options =>
 
 // Custom extension method
 builder.Services.AddApplicationServices();
-builder.Services.Configure<FeatureFlags>(
-    builder.Configuration.GetSection("Featuers"));
 
-builder.Services.AddRateLimiter(options =>
-{
-    options.AddPolicy("login", context =>
-        RateLimitPartition.GetFixedWindowLimiter(
-            partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
-            factory: _ => new FixedWindowRateLimiterOptions
-            {
-                PermitLimit = 5,
-                Window = TimeSpan.FromMinutes(1)
-            }));
-});
+builder.Services.Configure<FeatureFlags>(
+    builder.Configuration.GetSection(FeatureFlags.SectionName));
+builder.Services.AddSingleton(sp => 
+    sp.GetRequiredService<IOptions<FeatureFlags>>().Value);
+
+builder.Services.Configure<CleanupOptions>(
+    builder.Configuration.GetSection(CleanupOptions.SectionName));
+builder.Services.AddSingleton(sp => 
+    sp.GetRequiredService<IOptions<CleanupOptions>>().Value);
 
 var app = builder.Build();
 
