@@ -25,6 +25,7 @@ namespace Pills
         }
         public DbSet<PillsTaken> PillsTaken { get; set; }
         public DbSet<PillsTypes> PillsTypes { get; set; }
+        public DbSet<DailyPillReport> DailyPillReport { get; set; }
         public bool IgnoreSoftDelete { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
