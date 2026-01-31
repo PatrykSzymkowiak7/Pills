@@ -66,18 +66,18 @@ namespace Pills.Controllers
             switch (result.Status)
             {
                 case OperationStatus.Success:
-                    TempData[TempDataKeys.Success] = "Tabletka wzięta pomyślnie";
+                    TempData[TempDataKeys.Success] = "Pill taken successfully";
                     break;
 
                 case OperationStatus.MaxLimitReached:
-                    TempData[TempDataKeys.Error] = "Osiągnięto maksymalną dawkę";
+                    TempData[TempDataKeys.Error] = "Maximum dose reached";
                     break;
 
                 case OperationStatus.NotFound:
                     return NotFound();
 
                 default:
-                    throw new InvalidOperationException($"Nieobsłużony typ: {result}");
+                    throw new InvalidOperationException($"Unhandled operation status: {result}");
             }
 
             return RedirectToAction(nameof(Today));
@@ -85,7 +85,7 @@ namespace Pills.Controllers
 
         public async Task<IActionResult> History(int page = 1, int? pillTypeId = null)
         {
-            const int pageSize = 10;
+            const int pageSize = 5;
 
             var userId = _userService.UserId;
 
@@ -124,7 +124,7 @@ namespace Pills.Controllers
                 })
                 .ToList();
 
-            var totalPages = (int)Math.Ceiling(days.Count / (double)pageSize);
+            var totalPages = (int)Math.Ceiling(totalDays / (double)pageSize);
 
             if (page > totalPages)
                 page = totalPages;

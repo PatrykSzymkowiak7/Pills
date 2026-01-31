@@ -18,6 +18,7 @@ namespace Pills.Common.Extensions
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IDateTimeProvider, DateTimeProvider>();
             services.AddScoped<AdminAuditFilter>();
+            services.AddScoped<IReminderService, ReminderService>();
 
             #endregion
 
@@ -30,6 +31,9 @@ namespace Pills.Common.Extensions
             #region Backgroundworkers
 
             services.AddHostedService<PillsStatsBackgroundService>();
+            services.AddHostedService<DailyReportBackgroundService>();
+            services.AddHostedService<ReminderBackgroundService>();
+            services.AddHostedService<SoftDeleteCleanUpBackgroundService>();
 
             #endregion
 

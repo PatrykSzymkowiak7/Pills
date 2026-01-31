@@ -1,22 +1,28 @@
 ﻿@using Pills.Models.ViewModels.PillTypes
 @model DeletePillTypeViewModel
 
-<h2>Are you sure you want remove this pill type?</h2>
+<div class="card shadow-sm">
+    <div class="card-body text-center">
 
-<div class="alert alert-warning">
-    <strong>@Model.Name</strong><br />
-    Taken <strong>@Model.Count</strong> times
+        <h3 class="mb-4">Are you sure you want to remove this pill type?</h3>
+
+        <div class="alert alert-warning">
+            <strong>@Model.Name</strong><br />
+            Taken <strong>@Model.Count</strong> times
+        </div>
+
+        <form asp-action="DeleteConfirmed" method="post" class="d-flex justify-content-center gap-2">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@Model.Id" />
+
+            <button type="submit" class="btn btn-danger">
+                Delete
+            </button>
+
+            <a asp-action="PillTypeHub" class="btn btn-secondary">
+                Cancel
+            </a>
+        </form>
+
+    </div>
 </div>
-
-<form asp-action="DeleteConfirmed" method="post">
-    @Html.AntiForgeryToken()
-    <input type="hidden" name="id" value="@Model.Id" />
-    
-    <button type="submit" class="btn btn-danger">
-        Delete
-    </button>
-
-    <a asp-action="PillTypeHub" class="btn btn-secondary">
-        Cancel
-    </a>
-</form>

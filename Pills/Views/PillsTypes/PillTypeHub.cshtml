@@ -1,42 +1,87 @@
 ﻿@using Pills.Models.ViewModels.PillTypes
 @model List<PillTypeHubViewModel>
 
-<h1>Manage pills</h1>
+<div class="card shadow-sm">
+    <div class="card-body">
 
-<table class="table table-striped table-hover w-auto">
-    <thead class="table-light">
-        <tr>
-            <th>Name</th>
-            <th>Maximum daily dose</th>
-            <th>Count of pills taken</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var pillType in Model)
-        {
-            <tr>
-                <td>@pillType.Name</td>
-                <td>@pillType.MaxAllowed</td>
-                <td>@pillType.Count</td>
-                <td>
-                    @if(!pillType.IsDeleted)
+        <h3 class="text-center mb-4">
+            Manage Pills
+        </h3>
+
+        <div class="table-responsive">
+
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Name</th>
+                        <th>Maximum daily dose</th>
+                        <th>Taken count</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var pillType in Model)
                     {
-                        <a asp-action="ConfirmDelete" asp-route-id="@pillType.Id" class="btn btn-danger btn-sm">
-                            Delete
-                        </a>
+                        <tr class="@(pillType.IsDeleted ? "table-secondary" : "")">
+
+                            <td>
+                                <strong>@pillType.Name</strong>
+
+                                @if (pillType.IsDeleted)
+                                {
+                                    <span class="badge bg-secondary ms-2">
+                                        Deleted
+                                    </span>
+                                }
+                            </td>
+
+                            <td>
+                                <span class="badge bg-info">
+                                    @pillType.MaxAllowed
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="badge bg-primary">
+                                    @pillType.Count
+                                </span>
+                            </td>
+
+                            <td class="text-end">
+
+                                @if (!pillType.IsDeleted)
+                                {
+                                    <a asp-action="ConfirmDelete"
+                                        asp-route-id="@pillType.Id"
+                                        class="btn btn-danger btn-sm">
+                                        Delete
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a asp-action="ConfirmRestore"
+                                        asp-route-id="@pillType.Id"
+                                        class="btn btn-warning btn-sm">
+                                        Restore
+                                    </a>
+                                }
+
+                                <a asp-action="Edit"
+                                    asp-route-id="@pillType.Id"
+                                    class="btn btn-primary btn-sm ms-1">
+                                    Edit
+                                </a>
+
+                            </td>
+
+                        </tr>
                     }
-                    else
-                    {
-                        <a asp-action="ConfirmRestore" asp-route-id="@pillType.Id" class="btn btn-warning btn-sm">
-                            Restore
-                        </a>
-                    }
-                    <a asp-action="Edit" asp-route-id="@pillType.Id" class="btn btn-primary btn-sm">
-                        Edit
-                    </a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+</div>

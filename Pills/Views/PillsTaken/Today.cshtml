@@ -1,41 +1,87 @@
 ﻿@using Pills.Models.ViewModels.PillsTaken
 @model List<TodayPillViewModel>
 
-<h1>Today - @String.Format("{0:dd/MM/yyyy}", DateTime.Today)</h1>
+<div class="card shadow-sm">
+    <div class="card-body">
 
-@foreach (var pill in Model)
-{
-    <div class="mb-2">
-        <strong>@pill.Name</strong>
+        <h3 class="text-center mb-4">
+            Today - @DateTime.Today.ToString("dd/MM/yyyy")
+        </h3>
 
-        @if (pill.Taken && !pill.MultipleAllowed)
+        @foreach (var pill in Model)
         {
-            <span style="color:green; margin-left:10px;">✔️ Taken</span>
-        }
-        else if(pill.MultipleAllowed)
-        {
-            if(pill.CanTake)
-            {
-                <form asp-controller="PillsTaken" asp-action="Take" method="post" style="display:inline;">
-                    @Html.AntiForgeryToken()
-                    <span>Today you took: @pill.TakenCountToday pills</span>
-                    <input type="hidden" name="pillTypeId" value="@pill.PillTypeId" />
-                    <button type="submit">Take next</button>
-                </form>
-            }
-            else
-            {
-                <span style="color:green; margin-left:10px;">✔️ You have already taken the maximum dose of @pill.MaxAllowed pills</span>
-            }
-        }
-        else
-        {
-            <form asp-controller="PillsTaken" asp-action="Take" method="post" style="display:inline;">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="pillTypeId" value="@pill.PillTypeId" />
-                <button type="submit">Mark as taken</button>
-            </form>
+            <div class="d-flex justify-content-between align-items-center border rounded p-3 mb-2">
+
+                <!-- LEFT SIDE -->
+                <div>
+                    <strong>@pill.Name</strong>
+
+                    @if (pill.MultipleAllowed)
+                    {
+                        <div class="text-muted small">
+                            Taken today: @pill.TakenCountToday / @pill.MaxAllowed
+                        </div>
+                    }
+                </div>
+
+                <!-- RIGHT SIDE -->
+                <div>
+
+                    @if (pill.Taken && !pill.MultipleAllowed)
+                    {
+                        <span class="badge bg-success">
+                            ✔ Taken
+                        </span>
+                    }
+                    else if (pill.MultipleAllowed)
+                    {
+                        if (pill.CanTake)
+                        {
+                            <form asp-controller="PillsTaken"
+                                    asp-action="Take"
+                                    method="post"
+                                    class="d-inline">
+
+                                @Html.AntiForgeryToken()
+
+                                <input type="hidden"
+                                        name="pillTypeId"
+                                        value="@pill.PillTypeId" />
+
+                                <button type="submit"
+                                        class="btn btn-sm btn-primary">
+                                    Take next
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success">
+                                Max dose reached
+                            </span>
+                        }
+                    }
+                    else
+                    {
+                        <form asp-controller="PillsTaken"
+                                asp-action="Take"
+                                method="post"
+                                class="d-inline">
+
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden"
+                                    name="pillTypeId"
+                                    value="@pill.PillTypeId" />
+
+                            <button type="submit"
+                                    class="btn btn-sm btn-success">
+                                Mark as taken
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
         }
     </div>
-}
-
+</div>

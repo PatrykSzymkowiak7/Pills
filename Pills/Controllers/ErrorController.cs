@@ -7,7 +7,7 @@ namespace Pills.Controllers
     {
         private readonly ILogger<ErrorController> _logger;
 
-        ErrorController(ILogger<ErrorController> logger)
+        public ErrorController(ILogger<ErrorController> logger)
         {
             _logger = logger;
         }
