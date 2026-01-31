@@ -6,11 +6,11 @@ namespace Pills.BackgroundServices
 {
     public class DailyReportBackgroundService : BackgroundService
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<DailyReportBackgroundService> _logger;
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly FeatureFlags _featureFlags;
-        public DailyReportBackgroundService(ILogger logger, IServiceScopeFactory scopeFactory, 
-            FeatureFlags featureFlags)
+        public DailyReportBackgroundService(ILogger<DailyReportBackgroundService> logger, 
+            IServiceScopeFactory scopeFactory, FeatureFlags featureFlags)
         {
             _logger = logger;
             _scopeFactory = scopeFactory;

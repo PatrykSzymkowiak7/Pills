@@ -41,6 +41,15 @@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="PillsTaken" asp-action="History">History</a>
                             </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" id="reminderDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Reminders
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="reminderDropdown">
+                                    <li><a class="dropdown-item" asp-controller="Reminder" asp-action="Create">Add new</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Reminder" asp-action="ReminderHub">Manage</a></li>
+                                </ul>
+                            </li>
                             @if (User.IsInRole(UserRoles.Admin))
                             {
                                 <li class="nav-item dropdown">
@@ -79,35 +88,39 @@
             </div>
         </nav>
     </header>
-    <div class="container">
+    <div class="container mt-4">
         <main role="main" class="pb-3">
 
-            <div class="container mt-3">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-7">
 
-                @if(TempData[TempDataKeys.Success] != null)
-                {
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        @TempData[TempDataKeys.Success]
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                }
+                    @if (TempData[TempDataKeys.Success] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+                            @TempData[TempDataKeys.Success]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
 
-                @if(TempData[TempDataKeys.Error] != null)
-                {
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        @TempData[TempDataKeys.Error]
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                }
+                    @if (TempData[TempDataKeys.Error] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+                            @TempData[TempDataKeys.Error]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    @RenderBody()
+
+                </div>
             </div>
 
-            @RenderBody()
         </main>
     </div>
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2026 - Pills - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2026 - Pills - Patryk Szymkowiak<a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

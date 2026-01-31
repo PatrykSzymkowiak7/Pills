@@ -1,29 +1,43 @@
 ﻿@using Pills.Models.ViewModels.PillTypes
 @model CreatePillTypeViewModel
 
-<h1>Add new pill</h1>
+<div class="card shadow-sm">
+    <div class="card-body">
 
-<form asp-action="Create" method="post">
-    @Html.AntiForgeryToken()
+        <h3 class="text-center mb-4">
+            Add New Pill
+        </h3>
 
-    <div class="mb-3">
-        <label asp-for="Name" class="form-label"></label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
+        <form asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="MaxAllowed" class="form-label"></label>
+                <input asp-for="MaxAllowed" class="form-control" />
+                <span asp-validation-for="MaxAllowed" class="text-danger"></span>
+
+                <div class="form-text">
+                    If value is greater than 1, pill can be taken multiple times per day.
+                </div>
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary">
+                    Add Pill
+                </button>
+            </div>
+
+        </form>
+
     </div>
+</div>
 
-    <div class="mb-3">
-        <label asp-for="MaxAllowed" class="form-label"></label>
-        <input asp-for="MaxAllowed" class="form-control" />
-        <span asp-validation-for="MaxAllowed" class="text-danger"></span>
-        <div class="form-text">
-            If > 1, pill can be taken multiple times daily
-        </div>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Dodaj</button>
-</form>
-
-@section Scripts{
+@section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }

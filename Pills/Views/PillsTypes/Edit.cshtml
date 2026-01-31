@@ -1,23 +1,37 @@
 ﻿@using Pills.Models.ViewModels.PillTypes
 @model EditPillTypeViewModel
 
-<h1>Edit pill</h1>
 
-<form asp-action="Edit" method="Post">
+<div class="card shadow-sm">
+    <div class="card-body">
 
-    <input asp-for="Id" type="hidden" />
+        <h3 class="text-center mb-4">
+            Edit pill
+        </h3>
 
-    <div class="mb-3">
-        <label asp-for="Name" class="form-label"></label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
+        <form asp-action="Edit" method="Post">
+            @Html.AntiForgeryToken();
+
+            <input asp-for="Id" type="hidden" />
+
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="MaxAllowed" class="form-label"></label>
+                <input asp-for="MaxAllowed" class="form-control" />
+                <span asp-validation-for="MaxAllowed" class="text-danger"></span>
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary">
+                    Save
+                </button>
+            </div>
+
+        </form>
     </div>
-
-    <div class="mb-3">
-        <label asp-for="MaxAllowed" class="form-label"></label>
-        <input asp-for="MaxAllowed" class="form-control" />
-        <span asp-validation-for="MaxAllowed" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Save</button>
-</form>
+</div>
