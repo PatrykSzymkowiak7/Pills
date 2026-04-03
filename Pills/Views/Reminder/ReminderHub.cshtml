@@ -44,11 +44,24 @@
                         </td>
 
                         <td class="text-end">
+
+                            <a asp-action="ConfirmDelete" 
+                                asp-route-id="@reminder.Id"
+                                class="btn-outline-danger btn-sm">
+                                Delete
+                            </a>
+
+                            <a asp-action="Edit"
+                                asp-route-id="@reminder.Id"
+                                class="btn btn-outline-info btn-sm">
+                                Edit
+                            </a>
+
                             @if (reminder.IsEnabled)
                             {
                                 <a asp-action="ToggleReminder"
                                     asp-route-id="@reminder.Id"
-                                    class="btn btn-outline-danger btn-sm">
+                                    class="btn btn-outline-warning btn-sm">
                                     Disable
                                 </a>
                             }
@@ -60,7 +73,9 @@
                                     Enable
                                 </a>
                             }
+
                         </td>
+
                     </tr>
                 }
             </tbody>

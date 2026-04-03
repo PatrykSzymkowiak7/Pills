@@ -47,7 +47,7 @@ namespace Pills.Controllers
             return View(model);
         }
 
-        public async Task<IActionResult> Create()
+        public IActionResult Create()
         {
             return View();
         }
@@ -82,6 +82,62 @@ namespace Pills.Controllers
             }
 
             return RedirectToAction(nameof(ReminderHub));
+        }
+
+        public async Task<IActionResult> Edit(int id)
+        {
+            var reminder = await _dbContext.Reminders.SingleOrDefaultAsync(r => r.Id == id);
+
+            if (reminder == null)
+                NotFound();
+
+            EditReminderViewModel model = new EditReminderViewModel()
+            {
+                Id = id,
+                Message = reminder.Message,
+                TimeOfDay = reminder.TimeOfDay
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(EditReminderViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var editReminderDto = _mapper.Map<EditReminderDto>(model);
+
+            var result = await _reminderService.EditReminder(editReminderDto);
+
+            switch (result.Status)
+            {
+                case OperationStatus.Success:
+                    TempData[TempDataKeys.Success] = "Operation completed successfully";
+                    break;
+
+                case OperationStatus.InvalidData:
+                    TempData[TempDataKeys.Error] = "Data is invalid";
+                    break;
+
+                case OperationStatus.NotFound:
+                    TempData[TempDataKeys.Error] = "Reminder not found";
+                    break;
+
+                default:
+                    throw new InvalidOperationException($"An unhandled exception occured: {result.Status}");
+            }
+
+            return RedirectToAction(nameof(ReminderHub));
+        }
+
+        public async Task<IActionResult> ConfirmDelete(int id)
+        {
+            var result = _reminderService.GetById(id);
+
+            return View(result);
         }
     }
 }
