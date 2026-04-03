@@ -1,11 +1,9 @@
 ﻿using AutoMapper;
-using Pills.Models;
-using Pills.Models.DTOs.PillTypes;
-using Pills.Models.DTOs.Reminders;
-using Pills.Models.ViewModels.PillTypes;
-using Pills.Models.ViewModels.Reminders;
+using Pills.Domain.Models;
+using Pills.Domain.Models.DTOs.Reminders;
+using Pills.Domain.Models.ViewModels.Reminders;
 
-namespace Pills.Common.Mapping
+namespace Pills.Infrastructure.Common.Mapping
 {
     public class ReminderProfile : Profile
     {

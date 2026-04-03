@@ -1,12 +1,14 @@
-﻿using Pills.BackgroundServices;
-using Pills.Common.HealthChecks;
-using Pills.Common.Interfaces;
-using Pills.Controllers.Filters;
-using Pills.Services.Implementations;
-using Pills.Services.Interfaces;
-using System.Threading.RateLimiting;
+﻿using System.Threading.RateLimiting;
+using Pills.Infrastructure;
+using Pills.Infrastructure.BackgroundServices;
+using Pills.Infrastructure.Common;
+using Pills.Infrastructure.Common.HealthChecks;
+using Pills.Infrastructure.Common.Interfaces;
+using Pills.Infrastructure.Controllers.Filters;
+using Pills.Infrastructure.Services.Implementations;
+using Pills.Infrastructure.Services.Interfaces;
 
-namespace Pills.Common.Extensions
+namespace Pills.Infrastructure.Common.Extensions
 {
     public static class ServiceCollectionExtension
     {

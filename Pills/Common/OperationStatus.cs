@@ -1,4 +1,4 @@
-﻿namespace Pills.Common
+﻿namespace Pills.Infrastructure.Common
 {
     public enum OperationStatus
     {

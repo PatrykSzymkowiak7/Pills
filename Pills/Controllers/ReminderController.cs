@@ -3,12 +3,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Pills.Models.ViewModels.Reminders;
-using Pills.Services.Interfaces;
-using Pills.Models.DTOs.Reminders;
-using Pills.Common;
+using Pills.Infrastructure;
+using Pills.Infrastructure.Common;
+using Pills.Infrastructure.Controllers;
+using Pills.Domain.Models.DTOs.Reminders;
+using Pills.Domain.Models.ViewModels.Reminders;
+using Pills.Infrastructure.Services.Interfaces;
 
-namespace Pills.Controllers
+namespace Pills.Infrastructure.Controllers
 {
     [Authorize]
     public class ReminderController : Controller

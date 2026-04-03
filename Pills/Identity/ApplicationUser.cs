@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace Pills.Identity
+namespace Pills.Infrastructure.Identity
 {
     public class ApplicationUser : IdentityUser
     {

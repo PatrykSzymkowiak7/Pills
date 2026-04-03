@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Pills.Identity;
+using Pills.Infrastructure.Identity;
 
-namespace Pills.Areas.Identity.Pages.Account
+namespace Pills.Infrastructure.Areas.Identity.Pages.Account
 {
     public class LogoutModel : PageModel
     {

@@ -1,4 +1,6 @@
-﻿namespace Pills.Common
+﻿using Pills.Infrastructure.Common;
+
+namespace Pills.Infrastructure.Common
 {
     public class OperationResult
     {

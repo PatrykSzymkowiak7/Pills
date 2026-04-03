@@ -1,9 +1,11 @@
 ﻿
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Pills.Identity;
+using Pills.Infrastructure;
+using Pills.Infrastructure.BackgroundServices;
+using Pills.Infrastructure.Identity;
 
-namespace Pills.BackgroundServices
+namespace Pills.Infrastructure.BackgroundServices
 {
     public class ReminderBackgroundService : BackgroundService
     {

@@ -1,4 +1,4 @@
-﻿namespace Pills.Options
+﻿namespace Pills.Infrastructure.Options
 {
     // Options configurable in appsettings for SoftDeleteCleanupBackgroundService
     public class CleanupOptions

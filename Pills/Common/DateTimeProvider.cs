@@ -1,6 +1,6 @@
-﻿using Pills.Common.Interfaces;
+﻿using Pills.Infrastructure.Common.Interfaces;
 
-namespace Pills.Common
+namespace Pills.Infrastructure.Common
 {
     public class DateTimeProvider :IDateTimeProvider
     {

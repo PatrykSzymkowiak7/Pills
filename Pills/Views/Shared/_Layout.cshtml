@@ -1,8 +1,9 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@using Pills.Infrastructure.Common
+@using Pills.Infrastructure.Identity
+@using Pills.Infrastructure.Identity
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
-@using Pills.Common
-@using Pills.Identity
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -114,7 +115,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2026 - Pills - Patryk Szymkowiak<a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2026 - Pills - Patryk Szymkowiak
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

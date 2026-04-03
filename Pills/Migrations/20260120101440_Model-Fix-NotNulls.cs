@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Pills.Migrations
+namespace Pills.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class ModelFixNotNulls : Migration

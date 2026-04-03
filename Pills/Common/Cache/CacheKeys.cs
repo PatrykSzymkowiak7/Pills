@@ -1,4 +1,4 @@
-﻿namespace Pills.Common.Cache
+﻿namespace Pills.Infrastructure.Common.Cache
 {
     public static class CacheKeys
     {

@@ -1,8 +1,10 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
-using Pills.Options;
+using Pills.Infrastructure;
+using Pills.Infrastructure.BackgroundServices;
+using Pills.Infrastructure.Options;
 
-namespace Pills.BackgroundServices
+namespace Pills.Infrastructure.BackgroundServices
 {
     public class SoftDeleteCleanUpBackgroundService : BackgroundService
     {

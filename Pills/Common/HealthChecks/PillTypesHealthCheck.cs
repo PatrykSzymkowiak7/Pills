@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Pills.Infrastructure;
 
-namespace Pills.Common.HealthChecks
+namespace Pills.Infrastructure.Common.HealthChecks
 {
     public class PillTypesHealthCheck : IHealthCheck
     {

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
+using Pills.Infrastructure.Controllers.Filters;
 
-namespace Pills.Controllers.Filters
+namespace Pills.Infrastructure.Controllers.Filters
 {
     public class AdminAuditFilter : IActionFilter
     {
