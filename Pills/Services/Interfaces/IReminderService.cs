@@ -8,5 +8,9 @@ namespace Pills.Services.Interfaces
     public interface IReminderService
     {
         public Task<OperationResult<CreateReminderDto>> CreateReminder(CreateReminderDto viewModel);
+
+        public Task<OperationResult> EditReminder(EditReminderDto editReminderDto);
+
+        public Task<OperationResult<ReminderDto>> GetById(int id);
     }
 }

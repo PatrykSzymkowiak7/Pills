@@ -13,6 +13,10 @@ namespace Pills.Common.Mapping
         {
             CreateMap<CreateReminderViewModel, CreateReminderDto>();
             CreateMap<Reminder, CreateReminderDto>();
+
+            CreateMap<EditReminderViewModel, EditReminderDto>();
+
+            CreateMap<Reminder, ReminderDto>();
         }
     }
 }
