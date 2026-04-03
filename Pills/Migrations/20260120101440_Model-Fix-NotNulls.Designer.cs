@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Pills;
+using Pills.Infrastructure;
 
 #nullable disable
 
-namespace Pills.Migrations
+namespace Pills.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     [Migration("20260120101440_Model-Fix-NotNulls")]

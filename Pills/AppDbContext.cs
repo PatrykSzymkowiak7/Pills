@@ -1,17 +1,19 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Pills.Models;
 using System.Collections.Generic;
 using System.Reflection.Emit;
-using Pills.Identity;
 using System.Security.Claims;
 using Org.BouncyCastle.Asn1.X509.Qualified;
 using Microsoft.AspNetCore.Razor.Language.Intermediate;
-using Pills.Services.Interfaces;
 using Microsoft.CodeAnalysis;
-using Pills.Common.Interfaces;
+using Pills.Infrastructure;
+using Pills.Infrastructure.Common.Interfaces;
+using Pills.Infrastructure.Identity;
+using Pills.Domain.Models;
+using Pills.Infrastructure.Services.Interfaces;
+using Pills.Domain.Common.Interfaces;
 
-namespace Pills
+namespace Pills.Infrastructure
 {
     public class AppDbContext : IdentityDbContext<ApplicationUser>
     {

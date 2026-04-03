@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
-using Pills.Models;
-using Pills.Models.DTOs.PillTypes;
-using Pills.Models.ViewModels.PillTypes;
+using Pills.Domain.Models;
+using Pills.Domain.Models.DTOs.PillTypes;
+using Pills.Domain.Models.ViewModels.PillTypes;
 
-namespace Pills.Common.Mapping
+namespace Pills.Infrastructure.Common.Mapping
 {
     public class PillsTypeProfile : Profile
     {

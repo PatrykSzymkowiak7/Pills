@@ -2,17 +2,18 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Pills.Common;
-using Pills.Identity;
-using Pills.Models;
-using Pills.Models.ViewModels.PillsTaken;
-using Pills.Services.Interfaces;
 using System.Security.Claims;
-using Pills.Models.DTOs;
-using Pills.Models.DTOs.PillTaken;
+using Pills.Domain.Models.DTOs;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Pills.Infrastructure;
+using Pills.Infrastructure.Common;
+using Pills.Infrastructure.Controllers;
+using Pills.Infrastructure.Identity;
+using Pills.Domain.Models.DTOs.PillTaken;
+using Pills.Domain.Models.ViewModels.PillsTaken;
+using Pills.Infrastructure.Services.Interfaces;
 
-namespace Pills.Controllers
+namespace Pills.Infrastructure.Controllers
 {
     [Authorize]
     public class PillsTakenController : Controller

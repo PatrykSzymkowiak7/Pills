@@ -14,10 +14,11 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
-using Pills.Identity;
 using Microsoft.AspNetCore.RateLimiting;
+using Pills.Infrastructure.Areas.Identity.Pages.Account;
+using Pills.Infrastructure.Identity;
 
-namespace Pills.Areas.Identity.Pages.Account
+namespace Pills.Infrastructure.Areas.Identity.Pages.Account
 {
     public class LoginModel : PageModel
     {

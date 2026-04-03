@@ -1,20 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Pills.Models.ViewModels.PillTypes;
-using Pills.Services.Interfaces;
-using Pills.Common;
 using Microsoft.AspNetCore.Authorization;
-using Pills.Identity;
-using Pills.Controllers.Filters;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using Org.BouncyCastle.Asn1.Mozilla;
 using System.Runtime.CompilerServices;
 using AutoMapper;
-using Pills.Models.DTOs.PillTypes;
 using Microsoft.AspNetCore.RateLimiting;
+using Pills.Infrastructure;
+using Pills.Infrastructure.Common;
+using Pills.Infrastructure.Controllers;
+using Pills.Infrastructure.Controllers.Filters;
+using Pills.Infrastructure.Identity;
+using Pills.Domain.Models.DTOs.PillTypes;
+using Pills.Domain.Models.ViewModels.PillTypes;
+using Pills.Infrastructure.Services.Interfaces;
 
-namespace Pills.Controllers
+namespace Pills.Infrastructure.Controllers
 {
     [Authorize(Policy = Policies.CanManagePillTypes)]
     public class PillsTypesController : Controller

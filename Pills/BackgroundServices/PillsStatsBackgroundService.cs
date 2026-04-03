@@ -1,7 +1,11 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
 
-namespace Pills.BackgroundServices
+using Pills.Infrastructure;
+
+using Pills.Infrastructure.BackgroundServices;
+
+namespace Pills.Infrastructure.BackgroundServices
 {
     public class PillsStatsBackgroundService : BackgroundService
     {

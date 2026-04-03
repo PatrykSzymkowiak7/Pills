@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using Pills.Models;
-using Pills.Models.DTOs.PillTaken;
+using Pills.Domain.Models;
+using Pills.Domain.Models.DTOs.PillTaken;
 
-namespace Pills.Common.Mapping
+namespace Pills.Infrastructure.Common.Mapping
 {
     public class PillsTakenProfile : Profile
     {

@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Pills.Infrastructure.Controllers;
 
-namespace Pills.Controllers
+namespace Pills.Infrastructure.Controllers
 {
     public class ErrorController : Controller
     {

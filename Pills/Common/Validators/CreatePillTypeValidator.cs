@@ -1,9 +1,10 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Pills.Models.ViewModels.PillTypes;
+using Pills.Infrastructure;
+using Pills.Domain.Models.ViewModels.PillTypes;
 
-namespace Pills.Common.Validators
+namespace Pills.Infrastructure.Common.Validators
 {
     public class CreatePillTypeValidator : AbstractValidator<CreatePillTypeViewModel>
     {

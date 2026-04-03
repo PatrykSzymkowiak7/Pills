@@ -1,4 +1,4 @@
-﻿namespace Pills.Identity
+﻿namespace Pills.Infrastructure.Identity
 {
     public static class UserRoles
     {

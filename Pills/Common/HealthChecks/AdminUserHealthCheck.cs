@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Pills.Identity;
+using Pills.Infrastructure;
+using Pills.Infrastructure.Identity;
 
-namespace Pills.Common.HealthChecks
+namespace Pills.Infrastructure.Common.HealthChecks
 {
     public class AdminUserHealthCheck : IHealthCheck
     {
