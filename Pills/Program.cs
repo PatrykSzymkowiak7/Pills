@@ -5,10 +5,11 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using System.Text.Json;
 using Microsoft.Extensions.Options;
 using Pills.Infrastructure;
-using Pills.Infrastructure.Common.Extensions;
-using Pills.Infrastructure.Common.Validators;
+using Pills.Application.Common.Options;
+using Pills.Web.Identity;
+using Pills.Web.Common.Extensions;
+using Pills.Web.Common.Validators;
 using Pills.Infrastructure.Identity;
-using Pills.Infrastructure.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 

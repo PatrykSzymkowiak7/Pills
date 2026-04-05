@@ -1,4 +1,4 @@
-﻿namespace Pills.Infrastructure.Options
+﻿namespace Pills.Web.Options
 {
     public class FeatureFlags
     {

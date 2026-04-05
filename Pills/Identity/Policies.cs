@@ -1,4 +1,4 @@
-﻿namespace Pills.Infrastructure.Identity
+﻿namespace Pills.Web.Identity
 {
     public static class Policies
     {

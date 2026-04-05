@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Pills.Infrastructure.Controllers;
-using Pills.Infrastructure.Identity;
 using Pills.Domain.Models;
+using Microsoft.Extensions.Logging;
+using Pills.Web.Controllers;
+using Pills.Web.Identity;
+using Pills.Infrastructure.Identity;
 
-namespace Pills.Infrastructure.Controllers
+namespace Pills.Web.Controllers
 {
     [Authorize]
     public class HomeController : Controller

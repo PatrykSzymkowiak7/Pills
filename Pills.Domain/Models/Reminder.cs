@@ -9,5 +9,6 @@
         public bool Daily { get; set; }
         public DateTime? LastSentAt { get; set; }
         public bool IsEnabled { get; set; } = true;
-    }
+        public bool SendMail { get; set; } = false;
+     }
 }
