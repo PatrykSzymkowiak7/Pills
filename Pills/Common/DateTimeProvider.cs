@@ -1,6 +1,6 @@
-﻿using Pills.Infrastructure.Common.Interfaces;
+﻿using Pills.Application.Interfaces;
 
-namespace Pills.Infrastructure.Common
+namespace Pills.Web.Common
 {
     public class DateTimeProvider :IDateTimeProvider
     {

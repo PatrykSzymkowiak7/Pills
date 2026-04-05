@@ -1,14 +1,15 @@
 ﻿using System.Threading.RateLimiting;
 using Pills.Infrastructure;
 using Pills.Infrastructure.BackgroundServices;
-using Pills.Infrastructure.Common;
-using Pills.Infrastructure.Common.HealthChecks;
-using Pills.Infrastructure.Common.Interfaces;
-using Pills.Infrastructure.Controllers.Filters;
-using Pills.Infrastructure.Services.Implementations;
-using Pills.Infrastructure.Services.Interfaces;
+using Pills.Application.Services;
+using Pills.Application.Interfaces;
+using Pills.Infrastructure.Repositories;
+using Pills.Web.Common;
+using Pills.Web.Common.HealthChecks;
+using Pills.Web.Services;
+using Pills.Application.Common.Filters;
 
-namespace Pills.Infrastructure.Common.Extensions
+namespace Pills.Web.Common.Extensions
 {
     public static class ServiceCollectionExtension
     {
@@ -21,6 +22,8 @@ namespace Pills.Infrastructure.Common.Extensions
             services.AddScoped<IDateTimeProvider, DateTimeProvider>();
             services.AddScoped<AdminAuditFilter>();
             services.AddScoped<IReminderService, ReminderService>();
+            services.AddScoped<IPillRepository, PillRepository>();
+            services.AddScoped<IReminderRepository, ReminderRepository>();
 
             #endregion
 

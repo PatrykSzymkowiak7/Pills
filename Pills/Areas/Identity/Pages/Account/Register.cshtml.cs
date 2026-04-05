@@ -19,10 +19,11 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
-using Pills.Infrastructure.Areas.Identity.Pages.Account;
 using Pills.Infrastructure.Identity;
+using Pills.Web.Areas.Identity.Pages.Account;
+using Pills.Web.Identity;
 
-namespace Pills.Infrastructure.Areas.Identity.Pages.Account
+namespace Pills.Web.Areas.Identity.Pages.Account
 {
     public class RegisterModel : PageModel
     {

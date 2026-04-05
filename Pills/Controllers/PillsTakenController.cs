@@ -1,52 +1,40 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
-using Pills.Domain.Models.DTOs;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Pills.Infrastructure;
-using Pills.Infrastructure.Common;
-using Pills.Infrastructure.Controllers;
-using Pills.Infrastructure.Identity;
-using Pills.Domain.Models.DTOs.PillTaken;
-using Pills.Domain.Models.ViewModels.PillsTaken;
-using Pills.Infrastructure.Services.Interfaces;
+using Pills.Application.Interfaces;
+using Pills.Application.Common;
+using Pills.Application.DTOs.PillTaken;
+using Pills.Web.ViewModels.PillsTaken;
 
-namespace Pills.Infrastructure.Controllers
+namespace Pills.Web.Controllers
 {
     [Authorize]
     public class PillsTakenController : Controller
     {
-        private readonly AppDbContext _dbContext;
         private readonly IPillService _pillService;
         private readonly ILogger<PillsTakenController> _logger;
-        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IUserService _userService;
 
-        public PillsTakenController(AppDbContext dbContext, IPillService pillService, 
-            ILogger<PillsTakenController> logger, SignInManager<ApplicationUser> signInManager, IUserService userService)
+        public PillsTakenController(IPillService pillService, ILogger<PillsTakenController> logger, 
+            IUserService userService)
         {
-            _dbContext = dbContext;
             _pillService = pillService;
             _logger = logger;
-            _signInManager = signInManager;
             _userService = userService;
         }
 
         public async Task<IActionResult> Today()
         {
-            var model = await _dbContext.PillsTypes.Select(pt => new TodayPillViewModel
+            var pills = await _pillService.GetPillsTakenByUserAndDateAsync(_userService.UserId, DateTime.Now.Date);
+
+            var model = pills.Select(pt => new TodayPillViewModel
             {
-                PillTypeId = pt.Id,
+                PillTypeId = pt.PillTypeId,
                 Name = pt.Name,
                 MaxAllowed = pt.MaxAllowed,
-                TakenCountToday = _dbContext.PillsTaken.Count(p => 
-                    p.PillType.Id == pt.Id && 
-                    p.Date.Date == DateTime.UtcNow.Date &&
-                    p.UserId == _userService.UserId)
+                TakenCountToday = pt.TakenCountToday
             })
-            .ToListAsync();
+            .ToList();
 
             return View(model);
         }
@@ -86,67 +74,25 @@ namespace Pills.Infrastructure.Controllers
 
         public async Task<IActionResult> History(int page = 1, int? pillTypeId = null)
         {
-            const int pageSize = 5;
+            const int pageSize = 10;
 
-            var userId = _userService.UserId;
-
-            var baseQuery = _dbContext.PillsTaken
-                .Where(pt => pt.UserId == userId);
-
-            if(pillTypeId.HasValue)
-                baseQuery = baseQuery.Where(p => p.PillTypeId == pillTypeId);
-
-            var daysQuery = baseQuery
-                .Select(p => p.Date.Date)
-                .Distinct()
-                .OrderByDescending(d => d);
-
-            var totalDays = await daysQuery.CountAsync();
-
-            var pagedDays = await daysQuery
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-            var pills = await _dbContext.PillsTaken
-                .Include(pt => pt.PillType)
-                .Where(p => 
-                    p.UserId == userId && 
-                    pagedDays.Contains(p.Date.Date))
-                .ToListAsync();
-
-            var days = pills
-                .GroupBy(p => p.Date.Date)
-                .OrderByDescending(g => g.Key)
-                .Select(g => new HistoryDayViewModel
-                {
-                    Date = g.Key,
-                    PillsTaken = g.Select(p => p.PillType.Name).ToList()
-                })
-                .ToList();
-
-            var totalPages = (int)Math.Ceiling(totalDays / (double)pageSize);
-
-            if (page > totalPages)
-                page = totalPages;
+            var result = await _pillService.GetHistoryAsync(
+                _userService.UserId, 
+                page, 
+                pageSize, 
+                pillTypeId);
 
             var model = new HistoryPagedViewModel
             {
-                Days = days,
-                CurrentPage = page,
-                PageSize = pageSize,
-                TotalPages = totalPages,
-                SelectedPillTypeId = pillTypeId
-            };
-
-            model.PillTypes = await _dbContext.PillsTypes
-                .Select(pt => new SelectListItem
+                Days = result.Days.Select(d => new HistoryDayViewModel
                 {
-                    Value = pt.Id.ToString(),
-                    Text = pt.Name,
-                    Selected = pt.Id == pillTypeId
-                })
-                .ToListAsync();
+                    Date = d.Date,
+                    PillsTaken = d.PillsTaken
+                }).ToList(),
+                CurrentPage = result.CurrentPage,
+                TotalPages = result.TotalPages,
+                SelectedPillTypeId = result.SelectedPillTypeId
+            };
 
             return View(model);
         }

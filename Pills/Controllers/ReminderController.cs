@@ -4,13 +4,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Pills.Infrastructure;
-using Pills.Infrastructure.Common;
-using Pills.Infrastructure.Controllers;
-using Pills.Domain.Models.DTOs.Reminders;
-using Pills.Domain.Models.ViewModels.Reminders;
-using Pills.Infrastructure.Services.Interfaces;
+using Pills.Application.Interfaces;
+using Pills.Application.Common;
+using Pills.Web.Controllers;
+using Pills.Application.DTOs.Reminders;
+using Pills.Web.ViewModels.Reminders;
 
-namespace Pills.Infrastructure.Controllers
+namespace Pills.Web.Controllers
 {
     [Authorize]
     public class ReminderController : Controller
@@ -137,7 +137,7 @@ namespace Pills.Infrastructure.Controllers
 
         public async Task<IActionResult> ConfirmDelete(int id)
         {
-            var result = _reminderService.GetById(id);
+            var result = _reminderService.GetByIdAsync(id);
 
             return View(result);
         }

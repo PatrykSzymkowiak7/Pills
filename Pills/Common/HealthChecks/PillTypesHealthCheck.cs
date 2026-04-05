@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Pills.Infrastructure;
 
-namespace Pills.Infrastructure.Common.HealthChecks
+namespace Pills.Web.Common.HealthChecks
 {
     public class PillTypesHealthCheck : IHealthCheck
     {

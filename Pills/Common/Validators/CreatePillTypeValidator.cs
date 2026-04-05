@@ -2,9 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Pills.Infrastructure;
-using Pills.Domain.Models.ViewModels.PillTypes;
+using Pills.Web.ViewModels.PillTypes;
 
-namespace Pills.Infrastructure.Common.Validators
+namespace Pills.Web.Common.Validators
 {
     public class CreatePillTypeValidator : AbstractValidator<CreatePillTypeViewModel>
     {

@@ -3,8 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Pills.Infrastructure;
 using Pills.Infrastructure.Identity;
+using Pills.Web.Identity;
 
-namespace Pills.Infrastructure.Common.HealthChecks
+namespace Pills.Web.Common.HealthChecks
 {
     public class AdminUserHealthCheck : IHealthCheck
     {
