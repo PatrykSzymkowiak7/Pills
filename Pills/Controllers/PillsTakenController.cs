@@ -76,6 +76,8 @@ namespace Pills.Web.Controllers
         {
             const int pageSize = 10;
 
+            var pillTypes = await _pillService.GetPillTypesAsync();
+
             var result = await _pillService.GetHistoryAsync(
                 _userService.UserId, 
                 page, 
@@ -91,7 +93,12 @@ namespace Pills.Web.Controllers
                 }).ToList(),
                 CurrentPage = result.CurrentPage,
                 TotalPages = result.TotalPages,
-                SelectedPillTypeId = result.SelectedPillTypeId
+                SelectedPillTypeId = result.SelectedPillTypeId,
+                PillTypes = pillTypes.Select(p => new SelectListItem
+                {
+                    Text = p.Name,
+                    Value = p.Id.ToString()
+                }).ToList()
             };
 
             return View(model);

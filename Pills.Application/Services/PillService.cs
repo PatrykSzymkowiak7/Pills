@@ -69,6 +69,7 @@ namespace Pills.Application.Services
                 return OperationResult<bool>.Fail(OperationStatus.NotFound);
 
             await _pillRepository.SoftDeletePillTypeAsync(pillTypeId, userId);
+            await _pillRepository.SaveChangesAsync();
 
             _cache.Remove(CacheKeys.PillTypes);
 
@@ -211,6 +212,11 @@ namespace Pills.Application.Services
                 TotalPages = (int)Math.Ceiling(totalDays / (double)pageSize),
                 SelectedPillTypeId = pillTypeId
             };
+        }
+
+        public async Task<IReadOnlyList<PillTypeDto>> GetPillTypesAsync()
+        {
+            return await _pillRepository.GetPillTypesAsync();
         }
     }
 }
